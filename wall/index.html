@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>CT Wall</title>
+<meta name="theme-color" content="#002a52">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<style>
+:root { --navy:#002a52; --navy2:#0c3d6e; --red:#c8102e; --ink:#0f1d2e; --mut:#5b6b7e; --line:#dbe3ec; --bg:#e9eef5;
+--green:#16a34a; --amber:#f59e0b; --u: clamp(14px, 2vh, 24px); }
+* { box-sizing: border-box; margin: 0; -webkit-tap-highlight-color: transparent; }
+html, body { height: 100%; }
+body { font-family: "Segoe UI", system-ui, -apple-system, Arial, sans-serif; background: var(--bg); color: var(--ink); }
+a { color: inherit; }
+.app { height: 100vh; height: 100dvh; display: flex; flex-direction: column; }
+header { background: linear-gradient(125deg, #002a52 0%, #001830 75%); color: #fff; padding: calc(8px + env(safe-area-inset-top)) 22px 8px; display: flex; align-items: center; gap: 14px; border-bottom: 4px solid var(--red); flex: none; }
+header .jet { width: 46px; height: 40px; fill: rgba(255,255,255,.93); flex: none; }
+header h1 { font-size: 26px; font-weight: 800; line-height: 1.05; letter-spacing: .01em; }
+header .sub { font-size: 13px; color: #a9c4e2; margin-top: 2px; }
+header .clock { margin-left: auto; font-size: 38px; font-weight: 800; font-variant-numeric: tabular-nums; line-height: 1; }
+.grid { flex: 1; min-height: 0; display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: 1.12fr 1fr; gap: 12px; padding: 12px 14px; }
+.box { background: #fff; border-radius: 14px; box-shadow: 0 1px 4px rgba(0,30,60,.1); display: flex; flex-direction: column; min-height: 0; overflow: hidden; position: relative; }
+.bh { display: flex; align-items: center; gap: 10px; padding: 10px 16px; font-weight: 800; letter-spacing: .08em; font-size: calc(var(--u) * .78); text-transform: uppercase; color: #fff; flex: none; }
+.box.b-board .bh { background: linear-gradient(90deg,#002a52,#0c3d6e); }
+.box.b-ct .bh { background: linear-gradient(90deg,#8f0b21,#c8102e); }
+.box.b-atl .bh { background: linear-gradient(90deg,#002a52,#0c3d6e); }
+.box.b-all .bh { background: linear-gradient(90deg,#0f5132,#16a34a); }
+.bh .ttl { opacity: .85; font-weight: 600; letter-spacing: .04em; text-transform: none; margin-left: auto; text-align: right; }
+.bb { flex: 1; min-height: 0; position: relative; }
+.panel { position: absolute; inset: 0; padding: 12px 16px 24px; opacity: 0; visibility: hidden; transition: opacity .7s, visibility .7s; display: flex; flex-direction: column; gap: 10px; }
+.panel.on { opacity: 1; visibility: visible; }
+.pdots { position: absolute; left: 0; right: 0; bottom: 8px; display: flex; gap: 7px; justify-content: center; }
+.pdots i { width: 9px; height: 9px; border-radius: 50%; background: #cbd5e1; }
+.pdots i.on { background: var(--red); }
+.ph { font-size: calc(var(--u) * .85); font-weight: 800; letter-spacing: .06em; text-transform: uppercase; color: var(--navy); flex: none; }
+.kpis { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; flex: none; }
+.kpi { background: #f3f6fa; border-radius: 10px; padding: 8px 12px; border-top: 4px solid var(--navy); min-width: 0; }
+.kpi.bad { border-top-color: var(--red); } .kpi.ok { border-top-color: var(--green); } .kpi.warn { border-top-color: var(--amber); }
+.kpi .l { font-size: calc(var(--u) * .6); font-weight: 700; letter-spacing: .06em; color: var(--mut); text-transform: uppercase; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.kpi .v { font-size: calc(var(--u) * 2.2); font-weight: 800; color: var(--navy); line-height: 1.05; font-variant-numeric: tabular-nums; }
+.kpi .d { font-size: calc(var(--u) * .7); font-weight: 600; color: var(--mut); }
+.kpi .d.good { color: var(--green); } .kpi .d.badc { color: var(--red); }
+.bars { flex: 1; display: flex; flex-direction: column; justify-content: space-around; gap: 6px; min-height: 0; }
+.bar { display: grid; grid-template-columns: minmax(110px, 34%) 1fr auto; align-items: center; gap: 12px; font-size: var(--u); }
+.bar .n { font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.bar .t { height: calc(var(--u) * 1.05); background: #e6edf5; border-radius: 6px; overflow: hidden; }
+.bar .t b { display: block; height: 100%; background: linear-gradient(90deg, var(--navy2), var(--navy)); border-radius: 6px; }
+.bar .x { font-weight: 800; color: var(--navy); font-variant-numeric: tabular-nums; text-align: right; min-width: 70px; }
+.bar .x small { font-weight: 600; color: var(--mut); font-size: .72em; margin-left: 6px; }
+.band-green b { background: linear-gradient(90deg,#22c55e,#16a34a) !important; }
+.band-yellow b { background: linear-gradient(90deg,#fbbf24,#f59e0b) !important; }
+.band-orange b { background: linear-gradient(90deg,#fb923c,#ea580c) !important; }
+.band-red b { background: linear-gradient(90deg,#ef4444,#c8102e) !important; }
+.band-dark b { background: linear-gradient(90deg,#7f1d1d,#450a0a) !important; }
+.two { flex: 1; display: grid; grid-template-columns: 1fr 1fr; gap: 16px; min-height: 0; }
+table { width: 100%; border-collapse: collapse; font-size: calc(var(--u) * .95); }
+th { text-align: left; font-size: calc(var(--u) * .6); letter-spacing: .08em; text-transform: uppercase; color: var(--mut); padding: 2px 6px 5px; }
+td { padding: calc(var(--u) * .28) 6px; border-top: 1px solid var(--line); font-variant-numeric: tabular-nums; }
+.r { text-align: right; } .strong { font-weight: 800; color: var(--navy); } .mono { font-family: Consolas, "Courier New", monospace; font-weight: 700; } .red { color: var(--red); font-weight: 800; }
+.note { font-size: calc(var(--u) * .78); color: var(--mut); line-height: 1.35; }
+.line { display: grid; grid-template-columns: 30% 1fr; gap: 12px; padding: calc(var(--u) * .45) 4px; border-top: 1px solid var(--line); font-size: calc(var(--u) * .95); line-height: 1.25; }
+.line:first-of-type { border-top: 0; }
+.line .k { font-weight: 800; color: var(--navy); text-transform: uppercase; letter-spacing: .04em; font-size: .72em; padding-top: .25em; }
+.chart { flex: 1; min-height: 0; }
+.chart svg { width: 100%; height: 100%; display: block; }
+footer { flex: none; padding: 6px 22px calc(6px + env(safe-area-inset-bottom)); font-size: 13px; color: var(--mut); display: flex; gap: 12px; justify-content: space-between; }
+footer .stale { color: #b45309; font-weight: 800; }
+/* live board quadrant: the real board page, shown scaled to fit */
+.box.b-board { background: #fff; }
+.bframe { position: absolute; inset: 0; overflow: hidden; background: #fff; }
+.bframe iframe { position: absolute; left: 0; top: 0; border: 0; transform-origin: 0 0; pointer-events: none; background: #fff; }
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute"><defs>
+<symbol id="jet" viewBox="0 0 120 100">
+<path d="M6,50 Q6,45 20,44.5 L100,46 Q118,48 118,50 Q118,52 100,54 L20,55.5 Q6,55 6,50 Z"/>
+<path d="M54,46.5 L34,8 L46,8 L82,46 Z"/><path d="M54,53.5 L34,92 L46,92 L82,54 Z"/>
+<path d="M18,45.5 L8,27 L16,27 L32,45.5 Z"/><path d="M18,54.5 L8,73 L16,73 L32,54.5 Z"/>
+</symbol>
+</defs></svg>
+<div class="app">
+<header>
+<svg class="jet"><use href="#jet"/></svg>
+<div><h1>Central Tooling</h1><div class="sub" id="asof">ATL Dept 593</div></div>
+<div class="clock" id="clock">--:--</div>
+</header>
+<div class="grid" id="grid">
+<section class="box b-board" id="b-board"><div class="bframe" id="bframe"><iframe id="bf" title="Live Board" scrolling="no"></iframe></div></section>
+<section class="box b-ct" id="b-ct"><div class="bh">CT<span class="ttl" id="t-ct"></span></div><div class="bb" id="bb-ct"></div></section>
+<section class="box b-atl" id="b-atl"><div class="bh">ATL<span class="ttl" id="t-atl"></span></div><div class="bb" id="bb-atl"></div></section>
+<section class="box b-all" id="b-all"><div class="bh">Everything<span class="ttl" id="t-all"></span></div><div class="bb" id="bb-all"></div></section>
+</div>
+<footer><span id="foot"></span><span id="fresh"></span></footer>
+</div>
+<script>
+'use strict';
+const DEFAULT_BOARD = 'https://atl-dept593-board.onrender.com';
+const qs = new URLSearchParams(location.search);
+const BOARD = /^http:\/\/localhost(:\d+)?$/.test(qs.get('board') || '') ? qs.get('board') : DEFAULT_BOARD;
+const ROTATE_SEC = Math.max(8, parseInt(qs.get('sec') || '20', 10));
+const $ = s => document.querySelector(s);
+const esc = s => String(s == null ? '' : s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+const num = n => Number(n || 0).toLocaleString('en-US');
+const money = n => { n = Number(n || 0); const a = Math.abs(n);
+return a >= 1e6 ? '$' + (n / 1e6).toFixed(a >= 1e7 ? 1 : 2).replace(/\.?0+$/, '') + 'M' : a >= 1e3 ? '$' + Math.round(n / 1e3).toLocaleString('en-US') + 'K' : '$' + Math.round(n); };
+const moneyFull = n => '$' + Math.round(Number(n || 0)).toLocaleString('en-US');
+const pct = n => Math.round(Number(n || 0) * 100) + '%';
+const title = s => String(s || '').toLowerCase().replace(/\b[a-z]/g, c => c.toUpperCase()).replace(/\bAos\b/, 'AOS').replace(/\bRon\b/, 'RON').replace(/\bRad\b/, 'RAD');
+const phone = () => false;
+let D = null;
+const boxes = {};   // key -> {panels, idx, timer}
+function kpi(l, v, d, cls, dcls) { return `<div class="kpi ${cls || ''}"><div class="l">${esc(l)}</div><div class="v">${v}</div>${d ? `<div class="d ${dcls || ''}">${esc(d)}</div>` : ''}</div>`; }
+function bars(rows) {
+const max = Math.max(1, ...rows.map(r => r.v));
+return `<div class="bars">` + rows.map(r => `<div class="bar ${r.cls || ''}"><div class="n">${esc(r.n)}</div><div class="t"><b style="width:${Math.max(2, r.v / max * 100)}%"></b></div><div class="x">${r.label != null ? r.label : num(r.v)}${r.small ? `<small>${esc(r.small)}</small>` : ''}</div></div>`).join('') + `</div>`;
+}
+function chart(points, key, color, fmt) {
+if (!points.length) return '';
+const w = 500, h = 330, pad = { l: 92, r: 12, t: 12, b: 32 };
+const vals = points.map(p => p[key]);
+let lo = Math.min(...vals), hi = Math.max(...vals);
+if (hi === lo) { hi += 1; lo -= 1; }
+const sp = hi - lo; lo = Math.max(0, lo - sp * .08); hi += sp * .08;
+const X = i => pad.l + (points.length === 1 ? 0 : i * (w - pad.l - pad.r) / (points.length - 1));
+const Y = v => pad.t + (hi - v) * (h - pad.t - pad.b) / (hi - lo);
+let g = '';
+for (let i = 0; i <= 3; i++) { const v = lo + (hi - lo) * i / 3, y = Y(v); g += `<line x1="${pad.l}" x2="${w - pad.r}" y1="${y}" y2="${y}" stroke="#e2e8f0"/><text x="${pad.l - 8}" y="${y + 5}" text-anchor="end" font-size="19" fill="#64748b">${fmt(v)}</text>`; }
+const path = points.map((p, i) => (i ? 'L' : 'M') + X(i).toFixed(1) + ',' + Y(p[key]).toFixed(1)).join(' ');
+const last = points[points.length - 1], md = d => { const p = d.split('-'); return +p[1] + '/' + +p[2]; };
+return `<svg viewBox="0 0 ${w} ${h}" preserveAspectRatio="xMidYMid meet">${g}<path d="${path} L${X(points.length - 1)},${h - pad.b} L${X(0)},${h - pad.b} Z" fill="${color}" opacity=".12"/><path d="${path}" fill="none" stroke="${color}" stroke-width="3.5" stroke-linejoin="round"/><circle cx="${X(points.length - 1)}" cy="${Y(last[key])}" r="6" fill="${color}"/><text x="${pad.l}" y="${h - 8}" font-size="19" fill="#64748b">${md(points[0].d)}</text><text x="${w - pad.r}" y="${h - 8}" text-anchor="end" font-size="19" fill="#64748b">${md(last.d)}</text></svg>`;
+}
+const bandCls = n => /MONITOR/.test(n) ? 'band-green' : /CONTACT/.test(n) ? 'band-yellow' : /FOLLOW/.test(n) ? 'band-orange' : /CRITICAL/.test(n) ? 'band-red' : 'band-dark';
+const ph = t => `<div class="ph">${esc(t)}</div>`;
+function panelsFor(key) {
+const ct = D.ct, atl = D.atl, all = D.all, tr = D.trend || [], f = tr[0] || {};
+const arrow = n => n < 0 ? '▼ ' + num(Math.abs(n)) : n > 0 ? '▲ ' + num(n) : 'no change';
+if (key === 'ct') return [
+{ t: 'Tools out at other stations', h: `<div class="kpis">${kpi('Tools out', num(ct.out), arrow(ct.deltaOut) + ' since last', 'bad', ct.deltaOut <= 0 ? 'good' : 'badc')}${kpi('Value exposed', money(ct.value), (ct.deltaValue < 0 ? '▼ ' : '▲ ') + money(Math.abs(ct.deltaValue)), 'bad', ct.deltaValue <= 0 ? 'good' : 'badc')}${kpi('Out 30+ days', num(ct.crit), money(ct.critValue), 'warn')}${kpi('Coming home', num(ct.confirmed), 'confirmed', 'ok')}</div>${bars(ct.reasons.slice(0, 3).map(r => ({ n: title(r.name), v: r.out, small: money(r.value) })))}` },
+{ t: 'Why tools are out', h: ph('Why tools are out') + bars(ct.reasons.slice(0, 6).map(r => ({ n: title(r.name), v: r.out, small: money(r.value) }))) },
+{ t: 'How long they have been out', h: ph('How long they have been out') + bars(ct.bands.map(b => ({ n: title(b.name).replace(/\(.*\)/, m => m.toLowerCase().replace('days', 'd')), v: b.count, cls: bandCls(b.name) }))) },
+{ t: 'Stations and worst offenders', h: `<div class="two"><div>${ph('Top stations by value')}<table><tr><th>Station</th><th class="r">Tools</th><th class="r">Value</th></tr>${ct.stations.slice(0, 5).map(s => `<tr><td class="strong">${esc(s.name)}</td><td class="r">${num(s.tools)}</td><td class="r strong">${money(s.value)}</td></tr>`).join('')}</table></div><div>${ph('Longest out')}<table><tr><th>Tool</th><th class="r">Days</th></tr>${ct.oldest.slice(0, 5).map(o => `<tr><td class="mono">${esc(o.id)}</td><td class="r red">${esc(String(o.days).replace(/ days?/i, ''))}</td></tr>`).join('')}</table></div></div>` },
+{ t: 'Is it getting better?', h: `<div class="two"><div style="display:flex;flex-direction:column">${ph('Tools out: ' + num(f.out) + ' → ' + num(ct.out))}<div class="chart">${chart(tr, 'out', '#002a52', v => Math.round(v))}</div></div><div style="display:flex;flex-direction:column">${ph('Value: ' + money(f.value) + ' → ' + money(ct.value))}<div class="chart">${chart(tr, 'value', '#c8102e', money)}</div></div></div>` }
+];
+if (key === 'atl') return [
+{ t: 'ATL tools away from home', h: `<div class="kpis">${kpi('Tools away', num(atl.away), '', 'bad')}${kpi('Value away', money(atl.value), '', 'bad')}${kpi('Overdue', num(atl.overdue), money(atl.overdueValue), 'warn')}${kpi('Over a year', num(atl.overYear), '', 'warn')}</div><p class="note">${esc(atl.sinceLast.replace(/ {2,}/g, '  ·  '))}</p>${bars(atl.reasons.slice().sort((a, b) => b.tools - a.tools).slice(0, 3).map(r => ({ n: title(r.name), v: r.tools, small: r.late ? num(r.late) + ' late' : '' })))}` },
+{ t: 'Why tools are away', h: ph('Why tools are away') + bars(atl.reasons.slice().sort((a, b) => b.tools - a.tools).slice(0, 6).map(r => ({ n: title(r.name), v: r.tools, small: r.late ? num(r.late) + ' late' : '' }))) },
+{ t: 'How long they have been gone', h: ph('How long they have been gone') + bars(atl.age.map(a => ({ n: title(a.name), v: a.tools, cls: /OVER/.test(a.name) ? 'band-red' : /91/.test(a.name) ? 'band-orange' : /31/.test(a.name) ? 'band-yellow' : /CLOCK/.test(a.name) ? '' : 'band-green' }))) },
+{ t: 'Where the money is', h: ph('Who is holding it') + bars(atl.holders.slice(0, 6).map(h => ({ n: h.name.replace(/^\d+\w*\s+/, '').slice(0, 24) || h.name, v: h.value, label: money(h.value), small: pct(h.share) }))) },
+{ t: 'Stations and kits', h: `<div class="two"><div>${ph('Stations')}<table><tr><th>Station</th><th class="r">Tools</th><th class="r">Value</th></tr>${atl.stations.slice(0, 5).map(s => `<tr><td class="strong">${esc(s.name)}</td><td class="r">${num(s.tools)}</td><td class="r strong">${money(s.value)}</td></tr>`).join('')}</table></div><div>${ph('Biggest kits away')}<table><tr><th>Kit</th><th class="r">Value</th></tr>${atl.kits.slice(0, 5).map(k => `<tr><td class="mono">${esc(k.id)}</td><td class="r strong">${money(k.value)}</td></tr>`).join('')}</table></div></div>` }
+];
+const L = all.lines, hd = all.headline;
+return [
+{ t: 'The headline numbers', h: `<div class="kpis">${hd.slice(0, 4).map((h, i) => kpi(h.label, h.money ? money(h.value) : num(h.value), h.delta, i < 2 ? 'bad' : 'warn', /DOWN/.test(h.delta) ? 'good' : /UP/.test(h.delta) ? 'badc' : '')).join('')}</div><div style="flex:1">${L.slice(0, 2).map(l => `<div class="line"><div class="k">${esc(l.label)}</div><div>${esc(l.text)}</div></div>`).join('')}</div>` },
+{ t: 'In plain words', h: ph('In plain words') + `<div>${L.slice(2, 5).map(l => `<div class="line"><div class="k">${esc(l.label)}</div><div>${esc(l.text)}</div></div>`).join('')}</div>` },
+{ t: 'CT recovery rate', h: `${ph('CT recovery rate over time — now ' + pct(ct.recoveryRate))}<div class="chart">${chart(tr, 'rate', '#16a34a', v => Math.round(v * 100) + '%')}</div><p class="note">All-time: ${num(ct.recovered)} tools returned, ${moneyFull(ct.recoveredValue)} recovered.</p>` },
+{ t: 'Checked out and in transit', h: ph('Checked out and in transit') + `<div>${[L[2], L[4], L[5]].filter(Boolean).map(l => `<div class="line"><div class="k">${esc(l.label)}</div><div>${esc(l.text)}</div></div>`).join('')}</div>` }
+];
+}
+function mountBox(key) {
+const ps = panelsFor(key), bb = $('#bb-' + key), old = boxes[key];
+const keep = old ? Math.min(old.idx, ps.length - 1) : 0;
+if (old && old.timer) clearInterval(old.timer);
+bb.innerHTML = ps.map((p, i) => `<div class="panel ${i === keep ? 'on' : ''}">${p.h}</div>`).join('') + `<div class="pdots">${ps.map((p, i) => `<i class="${i === keep ? 'on' : ''}"></i>`).join('')}</div>`;
+const b = boxes[key] = { ps, idx: keep, timer: null };
+const title = () => { $('#t-' + key).textContent = phone() ? '' : ps[b.idx].t; };
+title();
+b.timer = setInterval(() => {
+if (phone()) return;
+b.idx = (b.idx + 1) % ps.length;
+bb.querySelectorAll('.panel').forEach((e, i) => e.classList.toggle('on', i === b.idx));
+bb.querySelectorAll('.pdots i').forEach((e, i) => e.classList.toggle('on', i === b.idx));
+title();
+}, ROTATE_SEC * 1000);
+}
+const etFmt = new Intl.DateTimeFormat('en-US', { timeZone: 'America/New_York', year: 'numeric', month: 'numeric', day: 'numeric', hour: 'numeric', minute: 'numeric', hourCycle: 'h23' });
+function etParts(d) { const p = {}; etFmt.formatToParts(d).forEach(x => { p[x.type] = x.value; }); return { y: +p.year, mo: +p.month, d: +p.day, h: (+p.hour) % 24, mi: +p.minute }; }
+const BASE_W = 1500;
+function fitBoard() {
+const box = $('#bframe'), f = $('#bf'), w = box.clientWidth, h = box.clientHeight; if (!w || !h) return;
+const k = w / BASE_W;
+f.style.width = BASE_W + 'px'; f.style.height = Math.ceil(h / k) + 'px'; f.style.transform = 'scale(' + k + ')';
+}
+$('#bf').src = BOARD + '/';
+addEventListener('resize', fitBoard);
+async function loadData() {
+try { const r = await fetch(BOARD + '/api/dashboard', { cache: 'no-store' }); if (r.ok) { const d = await r.json(); if (d && d.ct) { try { localStorage.setItem('ctwall-data', JSON.stringify(d)); } catch (e) {} return d; } } } catch (e) {}
+try { const c = JSON.parse(localStorage.getItem('ctwall-data') || 'null'); if (c && c.ct) return c; } catch (e) {}
+try { const r = await fetch('seed.json', { cache: 'no-store' }); return await r.json(); } catch (e) { return null; }
+}
+let sig = '';
+async function refresh() {
+const d = await loadData(); if (!d) return;
+const s = JSON.stringify(d); if (s === sig) return;
+sig = s; D = d;
+['ct', 'atl', 'all'].forEach(mountBox);
+const t = new Date(D.asOf), hrs = (Date.now() - t.getTime()) / 36e5;
+const lbl = t.toLocaleString('en-US', { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' });
+$('#asof').textContent = 'Tool recovery numbers as of ' + lbl;
+$('#fresh').innerHTML = hrs > 36 ? `<span class="stale">Numbers are ${Math.floor(hrs / 24)} day${hrs >= 48 ? 's' : ''} old</span>` : 'Updated ' + lbl;
+}
+function clock() { const p = etParts(new Date()); $('#clock').textContent = String(p.h).padStart(2, '0') + ':' + String(p.mi).padStart(2, '0'); }
+(async function () {
+clock(); fitBoard(); await refresh();
+setInterval(clock, 10000); setInterval(refresh, 5 * 60 * 1000);
+document.addEventListener('visibilitychange', () => { if (!document.hidden) { refresh(); fitBoard(); } });
+})();
+</script>
+</body>
+</html>
