@@ -1,7 +1,7 @@
 {
-  "name": "CT Hub",
-  "short_name": "CT Hub",
-  "description": "ATL Dept 593 Central Tooling - live board and tool recovery numbers",
+  "name": "CT Live Board",
+  "short_name": "CT Board",
+  "description": "ATL Dept 593 Central Tooling - live board for phones",
   "start_url": ".",
   "display": "standalone",
   "background_color": "#002a52",
