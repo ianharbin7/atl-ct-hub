@@ -31,9 +31,9 @@
   @keyframes scrin { from { opacity: 0; transform: translateY(1.5vh); } to { opacity: 1; transform: none; } }
   .scr::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: .5vw; background: var(--c); }
   .scr.ct { --c: #ef4444; } .scr.atl { --c: #38bdf8; } .scr.all { --c: #22c55e; }
-  .top { display: flex; align-items: center; gap: 1.78cqh; flex: none; margin-bottom: 2cqh; }
+  .top { display: flex; flex-direction: column; align-items: flex-start; gap: 1.2cqh; flex: none; margin-bottom: 1.6cqh; }
   .tag { padding: .5cqh 1.96cqh; border-radius: 999px; font-size: 2.2cqh; font-weight: 800; letter-spacing: .14em; color: #fff; background: var(--c); }
-  .ttl { font-size: 4cqh; font-weight: 800; letter-spacing: .02em; line-height: 1.1; }
+  .ttl { font-size: 4.6cqh; font-weight: 800; letter-spacing: .02em; line-height: 1.1; }
     .stale { color: var(--amber); font-weight: 700; }
   .body { flex: 1; min-height: 0; display: flex; flex-direction: column; gap: 2.6cqh; justify-content: space-evenly; }
   .foot { flex: none; margin-top: 1.2cqh; font-size: 1.9cqh; color: var(--mut); text-align: right; }
@@ -91,6 +91,15 @@
   .say b { display: block; font-size: 2.2cqh; letter-spacing: .1em; text-transform: uppercase; color: var(--blue); margin-bottom: .7cqh; }
   .say span { font-size: 3cqh; line-height: 1.3; font-weight: 500; }
   .empty { margin: auto; font-size: 3cqh; color: var(--mut); text-align: center; }
+  .scr.mv { --c: #a78bfa; } .scr.co { --c: #f59e0b; } .scr.act { --c: #2dd4bf; } .scr.tg { --c: #f472b6; }
+  .tag { white-space: nowrap; }
+  .sub { flex: none; margin: -.6cqh 0 2.2cqh; font-size: 2.7cqh; font-weight: 500; line-height: 1.25; color: #b5cbe2; }
+  .goals { flex: 1; display: flex; flex-direction: column; justify-content: space-evenly; gap: 1.2cqh; }
+  .goal { display: grid; grid-template-columns: 1fr auto; align-items: center; gap: 2cqh; background: #0f2238; border: 1px solid var(--line); border-radius: 1.78cqh; padding: 1.6cqh 2.4cqh; }
+  .goal .a { font-size: 3.1cqh; font-weight: 800; min-width: 0; }
+  .goal .a small { display: block; margin-top: .4cqh; font-size: 2.4cqh; font-weight: 600; color: #b5cbe2; }
+  .goal .st { font-size: 2.9cqh; font-weight: 800; padding: .9cqh 2.2cqh; border-radius: 999px; white-space: nowrap; }
+  .goal .st.g { background: rgba(34,197,94,.2); color: #6ee7a0; } .goal .st.y { background: rgba(245,158,11,.22); color: #fbbf24; } .goal .st.r { background: rgba(239,68,68,.22); color: #ff8a8a; }
 </style>
 </head>
 <body>
@@ -105,7 +114,7 @@
 const DEFAULT_BOARD = 'https://atl-dept593-board.onrender.com';
 const qs = new URLSearchParams(location.search);
 const BOARD = /^http:\/\/localhost(:\d+)?$/.test(qs.get('board') || '') ? qs.get('board') : DEFAULT_BOARD;
-const ROTATE_SEC = Math.max(8, parseInt(qs.get('sec') || '40', 10));
+const ROTATE_SEC = Math.max(8, parseInt(qs.get('sec') || '30', 10));
 const $ = s => document.querySelector(s);
 const esc = s => String(s == null ? '' : s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 const num = n => Number(n || 0).toLocaleString('en-US');
@@ -117,7 +126,7 @@ const title = s => String(s || '').toLowerCase().replace(/\b[a-z]/g, c => c.toUp
 const holder = n => { n = String(n || '').replace(/^\d+\w*\s+/, '') || String(n || ''); return /^\(?blank\)?$/i.test(n) ? 'Unassigned' : n; };
 const cut = (s, n) => { s = String(s || ''); return s.length > n ? s.slice(0, n - 1) + '…' : s; };
 
-let D = null, cur = 0, screens = [], timer = null, cols = 1, board = null;
+let scrEls = [], D = null, cur = 0, screens = [], timer = null, cols = 1, board = null;
 
 // ── building blocks ──────────────────────────────────────────────────────────
 const hero = (label, val, chip, cls, big) => `<div class="hero"><div class="l">${esc(label)}</div><div class="v${big ? ' m' : ''}">${val}</div>${chip ? `<div class="chip ${cls || 'flat'}">${chip}</div>` : ''}</div>`;
@@ -148,7 +157,7 @@ function chart(points, key, color, fmt, fixed, dims) {
   let g = '';
   for (let i = 0; i <= 4; i++) { const v = lo + (hi - lo) * i / 4, y = Y(v); g += `<line x1="${pad.l}" x2="${W - pad.r}" y1="${y}" y2="${y}" stroke="#1a3452"/><text x="${pad.l - 16}" y="${y + 11}" text-anchor="end" font-size="36" fill="#9bb7d4">${fmt(v)}</text>`; }
   const path = points.map((p, i) => (i ? 'L' : 'M') + X(i).toFixed(1) + ',' + Y(p[key]).toFixed(1)).join(' ');
-  const md = d => { const p = d.split('-'); return +p[1] + '/' + +p[2]; };
+  const md = d => { const p = d.split('-'); return p.length < 3 || d.length <= 7 ? ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][+p[1] - 1] : +p[1] + '/' + +p[2]; };
   const last = points.length - 1, mid = Math.floor(last / 2);
   return `<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="xMidYMid meet">${g}
     <path d="${path} L${X(last)},${H - pad.b} L${X(0)},${H - pad.b} Z" fill="${color}" opacity=".16"/>
@@ -163,46 +172,140 @@ const ageCls = n => /OVER/.test(n) ? 'r' : /91/.test(n) ? 'o' : /31/.test(n) ? '
 
 // ── the screens (one idea each, big enough to read from across the room) ─────
 function buildScreens() {
-  const ct = D.ct || {}, atl = D.atl || {}, all = D.all || {}, tr = D.trend || [], f = tr[0] || {};
+  const ct = D.ct || {}, atl = D.atl || {}, all = D.all || {}, tr = D.trend || [], f = tr[0] || {}, X = D.x || {};
   const L = all.lines || [], hd = all.headline || [], oc = ct.outreach || {}, sb = ct.sinceBaseline || {};
   const S = [];
-  const add = (tag, t, h) => S.push({ tag, t, h });
+  // add(group, plain-English title, what-it-means line, content)
+  const add = (tag, t, sub, h) => S.push({ tag, t, sub, h });
+  const MON = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+  const monName = m => { const p = String(m || '').split('-'); return p.length > 1 ? MON[(+p[1] || 1) - 1] + ' ' + p[0] : String(m || ''); };
+  const room = s => title(String(s || '').replace(/INTERNATIONA$/i, 'INTERNATIONAL').replace(/\s*TOOL(\s*R(O|OO|OOM)?)?$/i, '').replace(/^593\s+/, '').replace(/\s593\s/, ' ').replace(/\s*-\s*$/, '')).replace(/^(\w{3})\s/, (m, a) => a.toUpperCase() + ' ').replace(/\bToc5\b/, 'TOC5');
+  const SHIFT = { '1ST': '1st Shift (6a–2p)', '2ND': '2nd Shift (2p–11p)', '3RD': '3rd Shift (11p–6a)', '1ST WEEKEND': 'Weekend 1st (6:30a–6:30p)', '3RD WEEKEND': 'Weekend 3rd (6:30p–6:30a)' };
+  const shiftName = s => SHIFT[String(s || '').toUpperCase()] || title(s);
 
-  // CENTRAL TOOLING
+  // ───────────────────────── CENTRAL TOOLING ─────────────────────────
   { const [c1, k1] = chg(ct.deltaOut || 0, num, true);
-    add('ct', 'Tools out at other stations', hero('Tools out right now', num(ct.out), c1, k1) + tiles([{ v: money(ct.value), l: 'Value out', c: 'red' }, { v: num(ct.crit), l: 'Out 30+ days', s: money(ct.critValue), c: 'amber' }, { v: num(ct.confirmed), l: 'Coming home', c: 'green' }])); }
+    add('ct', 'Central Tooling tools still out', 'Tools we sent to other stations that have not come back yet',
+      hero('Tools out right now', num(ct.out), c1, k1) + tiles([{ v: money(ct.value), l: 'What they are worth', c: 'red' }, { v: num(ct.crit), l: 'Gone 30+ days', s: money(ct.critValue) + ' worth', c: 'amber' }, { v: num(ct.confirmed), l: 'On the way home', s: 'return shipment confirmed', c: 'green' }])); }
   { const [c2, k2] = chg(ct.deltaValue || 0, money, true);
-    add('ct', 'Value we have out', hero('Value out at other stations', money(ct.value), c2, k2, true) + tiles([{ v: num(ct.out), l: 'Tools out' }, { v: num(ct.avgDays), l: 'Avg days out' }, { v: money(ct.critValue), l: 'Out 30+ days', c: 'amber' }])); }
-  add('ct', 'Why tools are out', bars((ct.reasons || []).slice(0, 5).map(r => ({ n: title(r.name), v: r.out, small: money(r.value) }))));
-  add('ct', 'How long they have been out', bars((ct.bands || []).map(b => ({ n: title(b.name).replace(/\(.*\)/, m => m.toLowerCase().replace('days', 'days')), v: b.count, c: bandCls(b.name) }))));
-  add('ct', 'Biggest stations by value', bars((ct.stations || []).slice().sort((a, b) => b.value - a.value).slice(0, 5).map(s => ({ n: s.name, v: s.value, label: money(s.value), small: num(s.tools) + (s.tools === 1 ? ' tool' : ' tools') }))));
-  add('ct', 'Longest out', rowsList((ct.oldest || []).slice(0, 5).map(o => ({ a: o.id, b: String(o.days).toLowerCase(), c: 'red' }))));
-  add('ct', 'Most valuable still out', rowsList((ct.priciest || []).slice(0, 5).map(o => ({ a: o.id, b: String(o.days).toLowerCase() + ' out', c: '' }))));
-  add('ct', 'Tools out over time', `<div class="note">${num(f.out)} on ${f.d ? f.d.slice(5).replace('-', '/') : 'day one'} → <b style="color:#fff">${num(ct.out)}</b> now</div><div class="chartbox">${chart(tr, 'out', '#38bdf8', v => num(Math.round(v)))}</div>`);
-  add('ct', 'Value out over time', `<div class="note">${money(f.value)} → <b style="color:#fff">${money(ct.value)}</b> now</div><div class="chartbox">${chart(tr, 'value', '#f87171', money)}</div>`);
-  add('ct', 'Recovery rate', `<div class="gauge">${gauge(ct.recoveryRate)}<div class="gtxt"><div class="note">of tools we sent out have come back</div></div></div>` + tiles([{ v: num(ct.recovered), l: 'Tools returned' }, { v: money(ct.recoveredValue), l: 'Value recovered', c: 'green' }]) + `<div class="chartbox" style="flex:none">${chart(tr, 'rate', '#22c55e', v => Math.round(v * 100) + '%', [0, 1], [800, 420])}</div>`);
-  add('ct', 'How far we have come', tiles([{ v: num(Math.abs(sb.out || 0)), l: (sb.out || 0) <= 0 ? 'Fewer tools out' : 'More tools out', s: 'since we started', c: (sb.out || 0) <= 0 ? 'green' : 'red' }, { v: money(Math.abs(sb.value || 0)), l: (sb.value || 0) <= 0 ? 'Less value out' : 'More value out', s: 'since we started', c: (sb.value || 0) <= 0 ? 'green' : 'red' }]) + tiles([{ v: num(Math.abs(sb.crit || 0)), l: 'Fewer 30+ day', s: 'since we started', c: 'green' }, { v: pct(ct.recoveryRate), l: 'Recovery rate', c: 'green' }]));
-  add('ct', 'Reaching out to stations', tiles([{ v: num(oc.sent), l: 'Reminders sent' }, { v: num(oc.contacted), l: 'Stations contacted' }]) + tiles([{ v: num(oc.toolsEmailed), l: 'Tools emailed about' }, { v: esc(String(oc.withEmail || '-').split('/')[0].trim()), l: 'Emails on file', s: 'of ' + (String(oc.withEmail || '').split('/')[1] || '?').trim() + ' stations', c: 'amber' }]));
+    add('ct', 'Dollar value of tools still out', 'What the Central Tooling tools sitting at other stations are worth',
+      hero('Dollars out at other stations', money(ct.value), c2, k2, true) + tiles([{ v: num(ct.out), l: 'Number of tools' }, { v: num(ct.avgDays), l: 'Average days out' }, { v: money(ct.critValue), l: 'Value gone 30+ days', c: 'amber' }])); }
+  add('ct', 'Why our tools are out', 'Number of tools out, for each reason (AOS = aircraft on the ground)',
+    bars((ct.reasons || []).slice(0, 5).map(r => ({ n: title(r.name), v: r.out, small: money(r.value) }))));
+  add('ct', 'How long our tools have been out', 'Number of tools out, by how many days they have been gone',
+    bars((ct.bands || []).map(b => ({ n: title(b.name).replace(/\((.*?)\)/, (m, a) => '(' + a.replace(/-/g, '–') + ' days)'), v: b.count, c: bandCls(b.name) }))));
+  add('ct', 'Stations holding the most of our money', 'Dollar value of our tools sitting at each station',
+    bars((ct.stations || []).slice().sort((a, b) => b.value - a.value).slice(0, 5).map(s => ({ n: s.name, v: s.value, label: money(s.value), small: num(s.tools) + (s.tools === 1 ? ' tool' : ' tools') }))));
+  add('ct', 'The tools that have been out longest', 'Tool number and how many days it has been gone',
+    rowsList((ct.oldest || []).slice(0, 5).map(o => ({ a: o.id, b: String(o.days).toLowerCase(), c: 'red' }))));
+  add('ct', 'The most valuable tools still out', 'Tool number and how long it has been out',
+    rowsList((ct.priciest || []).slice(0, 5).map(o => ({ a: o.id, b: String(o.days).toLowerCase() + ' out', c: '' }))));
+  add('ct', 'Are fewer tools out than before?', 'Number of Central Tooling tools out, over time',
+    `<div class="note">${num(f.out)} on ${f.d ? f.d.slice(5).replace('-', '/') : 'day one'} → <b style="color:#fff">${num(ct.out)}</b> today</div><div class="chartbox">${chart(tr, 'out', '#38bdf8', v => num(Math.round(v)))}</div>`);
+  add('ct', 'Is less money out than before?', 'Dollar value of Central Tooling tools out, over time',
+    `<div class="note">${money(f.value)} → <b style="color:#fff">${money(ct.value)}</b> today</div><div class="chartbox">${chart(tr, 'value', '#f87171', money)}</div>`);
+  add('ct', 'Share of our tools that came back', 'Of all the tools we sent out, how many have been returned',
+    `<div class="gauge">${gauge(ct.recoveryRate)}<div class="gtxt"><div class="note">of tools sent out have come back</div></div></div>` + tiles([{ v: num(ct.recovered), l: 'Tools returned' }, { v: money(ct.recoveredValue), l: 'Dollars recovered', c: 'green' }]) + `<div class="chartbox" style="flex:1;min-height:0">${chart(tr, 'rate', '#22c55e', v => Math.round(v * 100) + '%', [0, 1], [800, 420])}</div>`);
+  add('ct', 'How far we have come', 'Change since we started tracking on ' + (f.d ? f.d.slice(5).replace('-', '/') : 'day one'),
+    tiles([{ v: num(Math.abs(sb.out || 0)), l: (sb.out || 0) <= 0 ? 'Fewer tools out' : 'More tools out', s: 'than when we started', c: (sb.out || 0) <= 0 ? 'green' : 'red' }, { v: money(Math.abs(sb.value || 0)), l: (sb.value || 0) <= 0 ? 'Less money out' : 'More money out', s: 'than when we started', c: (sb.value || 0) <= 0 ? 'green' : 'red' }]) + tiles([{ v: num(Math.abs(sb.crit || 0)), l: 'Fewer tools gone 30+ days', s: 'than when we started', c: 'green' }, { v: pct(ct.recoveryRate), l: 'Share returned', c: 'green' }]));
+  add('ct', 'Reminder emails to stations', 'Emails we sent asking stations to send our tools back',
+    tiles([{ v: num(oc.sent), l: 'Emails sent' }, { v: num(oc.contacted), l: 'Stations emailed' }]) + tiles([{ v: num(oc.toolsEmailed), l: 'Tools we emailed about' }, { v: esc(String(oc.withEmail || '-').split('/')[0].trim()), l: 'Stations with an email on file', s: 'out of ' + (String(oc.withEmail || '').split('/')[1] || '?').trim(), c: 'amber' }]));
+  if ((X.inbound || []).length) {
+    const ib = X.inbound, tot = ib.reduce((s, r) => s + (r.price || 0), 0);
+    add('ct', 'Tools on their way back to us', 'A return shipment is documented for each of these',
+      rowsList(ib.slice(0, 5).map(r => ({ a: cut(title(r.desc), 30), sub: r.id + ' · coming from ' + r.from + ' · ' + r.reason, b: moneyFull(r.price) }))) + `<div class="note">${ib.length} tools, ${moneyFull(tot)} total</div>`); }
 
-  // ALL OF ATL
+  // ───────────────────────── CT SHIPMENTS (who handles what) ─────────────────────────
+  if (X.moves && (X.moves.all || []).length) {
+    const m = X.moves, mm = String(m.monthName || '').match(/\((\w+)\s+(\d{4})\)/), mn = mm ? 'so far in ' + title(mm[1]) + ' ' + mm[2] : 'this month';
+    add('mv', 'Shipments we have handled', 'Tools Central Tooling moved: shipped out, sent between stations, or brought back',
+      hero('Shipments handled ' + mn, num(m.thisMonth), null, '', true) + tiles([{ v: num(m.lastMonth), l: 'All of last month' }, { v: num(m.year), l: 'So far this year' }, { v: num(m.allTime), l: 'Since we started counting' }]));
+    add('mv', 'Which shift handles the most shipments', 'Number of shipments each shift handled ' + mn,
+      bars(m.all.map(r => ({ n: shiftName(r.name), v: r.total, small: pct(r.share) }))));
+    if ((m.plane || []).length) add('mv', 'Aircraft-down shipments by shift', 'Shipments for planes that cannot fly until the tool arrives (AOS and similar), ' + mn,
+      bars(m.plane.map(r => ({ n: shiftName(r.name), v: r.total, small: pct(r.share) }))));
+    add('mv', 'Dollar value we shipped, by shift', 'Dollar value of tools sent out of ATL by each shift ' + mn,
+      bars(m.all.map(r => ({ n: shiftName(r.name), v: r.atlValue, label: money(r.atlValue), small: num(r.atl) + ' sent' }))));
+    add('mv', 'Busy times and top reasons', 'What the shipment record shows since we started counting',
+      tiles([{ v: esc(title(m.busiestDay)), l: 'Busiest day of the week', s: m.busiestDayNote }, { v: esc(m.topReason), l: 'Most common reason', s: m.topReasonNote }]) + tiles([{ v: pct(m.planeShare), l: 'Of shipments are for planes that are down', s: m.planeNote, c: 'red' }, { v: pct(m.weekend), l: 'Of shipments happen on weekends' }]));
+  }
+
+  // ───────────────────────── CHECKED OUT TO PEOPLE AND VENDORS ─────────────────────────
+  if (X.people) {
+    const p = X.people;
+    add('co', 'Tools checked out to people', 'ATL tools signed out to individual employees right now',
+      hero('Tools checked out to people', num(p.peopleTools), null, '') + tiles([{ v: money(p.peopleValue), l: 'What they are worth', c: 'amber' }, { v: num(p.mroTools), l: 'More are at repair vendors' }, { v: num(p.bothTools), l: 'Both together' }]));
+    if ((p.age || []).length) add('co', 'How long people have had tools', 'Tools checked out to people, by how long ago they were signed out',
+      bars(p.age.map(a => ({ n: title(a.name), v: a.count, small: money(a.value), c: /OVER/.test(a.name) ? 'r' : /^30/.test(a.name) ? 'y' : 'g' }))));
+    add('co', 'Tools at repair vendors', 'ATL tools on loan to outside repair companies (MRO) right now',
+      hero('Tools at vendors', num(p.mroTools), null, '', true) + tiles([{ v: money(p.mroValue), l: 'What they are worth', c: 'red' }, { v: pct(p.bothTools ? p.mroTools / p.bothTools : 0), l: 'Of all checked-out tools' }]));
+    if ((p.vendors || []).length) add('co', 'Vendors holding the most of our money', 'Dollar value of our tools at each repair vendor',
+      bars(p.vendors.slice(0, 5).map(v => ({ n: cut(title(v.name), 28), v: v.value, label: money(v.value), small: num(v.tools) + ' tools' }))));
+    add('co', 'Tools we have gotten back', 'Checked-out tools returned since tracking began',
+      tiles([{ v: num(p.recovered), l: 'Tools returned', c: 'green' }, { v: num(p.deleted), l: 'Written off', s: 'taken off the list', c: 'amber' }]));
+    if ((p.lists || []).length) add('co', 'Checked-out tools needing a look', 'Number of tools in each follow-up list',
+      bars(p.lists.map(l => ({ n: title(l.name).replace(/\bAny Age\b/, 'any age'), v: l.count, small: l.value ? money(l.value) : '' }))));
+  }
+
+  // ───────────────────────── ALL OF ATL ─────────────────────────
   { const sl = String(atl.sinceLast || '').match(/Tools away (UP|DOWN) ([\d,]+)/i);
     const chip = sl ? [(sl[1].toUpperCase() === 'DOWN' ? '▼ ' : '▲ ') + sl[2] + ' since last update', sl[1].toUpperCase() === 'DOWN' ? 'good' : 'bad'] : [null, ''];
-    add('atl', 'Tools away from home', hero('Tools away across ATL', num(atl.away), chip[0], chip[1]) + tiles([{ v: money(atl.value), l: 'Value away', c: 'red' }, { v: num(atl.overdue), l: 'Overdue', s: money(atl.overdueValue), c: 'amber' }, { v: num(atl.overYear), l: 'Over a year', c: 'amber' }])); }
-  add('atl', 'Why tools are away', bars((atl.reasons || []).slice().sort((a, b) => b.tools - a.tools).slice(0, 5).map(r => ({ n: title(r.name), v: r.tools, small: r.late ? num(r.late) + ' late' : '' }))));
-  add('atl', 'How long they have been gone', bars((atl.age || []).map(a => ({ n: title(a.name), v: a.tools, c: ageCls(a.name) }))));
-  add('atl', 'Who is holding the money', bars((atl.holders || []).slice(0, 5).map(h => ({ n: cut(holder(h.name), 26), v: h.value, label: money(h.value), small: pct(h.share) }))));
-  add('atl', 'Who holds the most tools', bars((atl.holders || []).slice().sort((a, b) => b.tools - a.tools).slice(0, 5).map(h => ({ n: cut(holder(h.name), 26), v: h.tools, small: money(h.value) }))));
-  add('atl', 'Where the tools are', bars((atl.stations || []).slice(0, 5).map(s => ({ n: /^[A-Z]{3}$/.test(s.name) ? s.name : title(s.name), v: s.value, label: money(s.value), small: num(s.tools) + ' tools' }))));
-  add('atl', 'Biggest kits away', rowsList((atl.kits || []).slice(0, 4).map(k => ({ a: k.id, sub: cut(title(k.desc || '').replace(/^Kit - /, ''), 40), b: money(k.value) }))) + tiles([{ v: money(atl.kitValue), l: 'Kits away', s: (atl.kitPct || 0) + '% of value' }, { v: num(atl.calCheck), l: 'Calibration check', c: 'amber' }]));
+    add('atl', 'ATL tools that are away from home', 'Every tool that belongs to ATL but is somewhere else right now',
+      hero('ATL tools away right now', num(atl.away), chip[0], chip[1]) + tiles([{ v: money(atl.value), l: 'What they are worth', c: 'red' }, { v: num(atl.overdue), l: 'Past their due date', s: money(atl.overdueValue) + ' worth', c: 'amber' }, { v: num(atl.overYear), l: 'Gone over a year', c: 'amber' }])); }
+  add('atl', 'Why ATL tools are away', 'Number of ATL tools away, for each reason',
+    bars((atl.reasons || []).slice().sort((a, b) => b.tools - a.tools).slice(0, 5).map(r => ({ n: /wrong crib/i.test(r.name) ? 'Right station, wrong crib' : title(r.name), v: r.tools, small: r.late ? num(r.late) + ' late' : '' }))));
+  add('atl', 'How long ATL tools have been gone', 'Number of ATL tools away, by how long',
+    bars((atl.age || []).map(a => ({ n: title(a.name), v: a.tools, c: ageCls(a.name) }))));
+  add('atl', 'Who is holding the most money', 'Dollar value of ATL tools held by each group',
+    bars((atl.holders || []).slice(0, 5).map(h => ({ n: cut(holder(h.name), 26), v: h.value, label: money(h.value), small: pct(h.share) }))));
+  add('atl', 'Who is holding the most tools', 'Number of ATL tools held by each group',
+    bars((atl.holders || []).slice().sort((a, b) => b.tools - a.tools).slice(0, 5).map(h => ({ n: cut(holder(h.name), 26), v: h.tools, small: money(h.value) }))));
+  add('atl', 'Where ATL tools are right now', 'Dollar value of ATL tools at each kind of place',
+    bars((atl.stations || []).slice(0, 5).map(s => ({ n: /^[A-Z]{3}$/.test(s.name) ? s.name : title(s.name), v: s.value, label: money(s.value), small: num(s.tools) + ' tools' }))));
+  add('atl', 'Biggest tool kits that are away', 'Large kits that are not at ATL, with their value',
+    rowsList((atl.kits || []).slice(0, 4).map(k => ({ a: k.id, sub: cut(title(k.desc || '').replace(/^Kit - /, ''), 40), b: money(k.value) }))) + tiles([{ v: money(atl.kitValue), l: 'All kits away', s: (atl.kitPct || 0) + '% of the money away' }, { v: num(atl.calCheck), l: 'Waiting on calibration check', c: 'amber' }]));
 
-  // EVERYTHING
-  if (hd.length) add('all', 'The headline numbers', `<div class="tiles" style="--n:2">${hd.slice(0, 4).map(h => `<div class="tile ${/DOWN/.test(h.delta) ? 'green' : /UP/.test(h.delta) ? 'red' : ''}"><div class="v">${h.money ? money(h.value) : num(h.value)}</div><div class="l">${esc(h.label)}</div><div class="s">${esc(String(h.delta || '').replace(/ vs 30 days ago/, '').replace(/^UP/, '▲').replace(/^DOWN/, '▼'))} vs 30 days</div></div>`).join('')}</div>`);
-  [[0, 1], [2, 3], [4, 5]].forEach(p => { const ls = p.map(i => L[i]).filter(Boolean); if (ls.length) add('all', 'In plain words', says(ls)); });
+  // ───────────────────────── TOOL ROOM ACTIVITY ─────────────────────────
+  const A = X.activity || {};
+  if (A.issuance) {
+    const i = A.issuance;
+    add('act', 'Tools checked out of tool rooms', 'Every tool signed out of a tool room in the last 30 days',
+      hero('Times tools were checked out', num(i.outTx), null, '') + tiles([{ v: num(i.outTools), l: 'Different tools used' }, { v: money(i.outValue), l: 'Value of those tools' }, { v: num(i.inTx), l: 'Times tools were returned', c: 'green' }]));
+  }
+  if ((A.monthly || []).length > 2) {
+    const mp = A.monthly.map(r => ({ d: r.m, out: r.out })), lastM = A.monthly[A.monthly.length - 1], prevM = A.monthly[A.monthly.length - 2];
+    add('act', 'Tool room traffic, month by month', 'Number of tool checkouts each month' + (lastM ? ' (' + monName(lastM.m) + ' is still in progress)' : ''),
+      `<div class="note">${monName(prevM.m)}: <b style="color:#fff">${num(prevM.out)}</b> checkouts</div><div class="chartbox">${chart(mp, 'out', '#a78bfa', v => num(Math.round(v)))}</div>`);
+  }
+  if (A.rooms && (A.rooms.rows || []).length) add('act', 'Busiest tool rooms', 'Tool checkouts so far in ' + monName(A.rooms.month) + ', by tool room',
+    bars(A.rooms.rows.slice().sort((a, b) => b.out - a.out).slice(0, 6).map(r => ({ n: room(r.room), v: r.out, small: r.station }))));
+  if (A.stations && (A.stations.rows || []).length) add('act', 'Tool room use by station', 'Tool checkouts so far in ' + monName(A.stations.month) + ', by station',
+    bars(A.stations.rows.slice(0, 6).map(r => ({ n: r.name, v: r.out }))));
+  if (A.shifts && (A.shifts.rows || []).length) add('act', 'Tool room use by shift', 'Tool checkouts so far in ' + monName(A.shifts.month) + ', all stations together',
+    bars(A.shifts.rows.map(r => ({ n: title(r.name), v: r.out }))));
+  if ((A.types || []).length) add('act', 'Other things tool rooms do', 'Number of other transactions (not checkouts), such as inventory, shipping and calibration',
+    bars(A.types.slice(0, 6).map(t => ({ n: title(t.name), v: t.n }))));
+  if ((A.topTools || []).length) add('act', 'Most checked-out tools', 'The tools signed out the most times since records began',
+    rowsList(A.topTools.slice(0, 5).map(t => ({ a: cut(title(t.desc), 28), sub: t.id, b: num(t.n) + ' times' }))));
+
+  // ───────────────────────── OUR GOALS ─────────────────────────
+  if ((X.targets || []).length) {
+    const T = X.targets, fmt = t => /average days/i.test(t.name) ? v => Math.round(v) + ' days' : /rate/i.test(t.name) ? v => pct(v) : /value|recovered since/i.test(t.name) ? money : num;
+    const stat = s => /MET|PACE/i.test(s) ? ['g', /MET/i.test(s) ? 'Goal met' : 'On pace'] : /BEHIND/i.test(s) ? ['y', 'Behind'] : ['r', 'Wrong way'];
+    const goal = list => `<div class="goals">` + list.map(t => { const f = fmt(t), s = stat(t.status); return `<div class="goal"><div class="a">${esc(t.name.replace(/\s*\(cumulative\)/i, ''))}<small>Now ${esc(f(t.now))} · Goal ${esc(f(t.target))}</small></div><div class="st ${s[0]}">${s[1]}</div></div>`; }).join('') + `</div>`;
+    const ctg = T.filter(t => /^CT:|recovered since/i.test(t.name)), atg = T.filter(t => !/^CT:|recovered since/i.test(t.name));
+    if (ctg.length) add('tg', 'Central Tooling goals', 'Where we are against the targets we set', goal(ctg.slice(0, 6)));
+    for (let i = 0; i < atg.length; i += 5) add('tg', 'ATL goals' + (atg.length > 5 ? ' (' + (i / 5 + 1) + ' of ' + Math.ceil(atg.length / 5) + ')' : ''), 'Where ATL stands against the targets we set', goal(atg.slice(i, i + 5)));
+  }
+
+  // ───────────────────────── THE BIG PICTURE ─────────────────────────
+  if (hd.length) add('all', 'The headline numbers', 'How the main numbers compare with 30 days ago', `<div class="tiles" style="--n:2">${hd.slice(0, 4).map(h => `<div class="tile ${/DOWN/.test(h.delta) ? 'green' : /UP/.test(h.delta) ? 'red' : ''}"><div class="v">${h.money ? money(h.value) : num(h.value)}</div><div class="l">${esc(h.label)}</div><div class="s">${esc(String(h.delta || '').replace(/ vs 30 days ago/, '').replace(/^UP/, '▲').replace(/^DOWN/, '▼'))} vs 30 days</div></div>`).join('')}</div>`);
+  [[0, 1], [2, 3], [4, 5]].forEach((p, n) => { const ls = p.map(i => L[i]).filter(Boolean); if (ls.length) add('all', 'The numbers in plain words (' + (n + 1) + ' of 3)', 'A short sentence for each number', says(ls)); });
   return S;
 }
 
 // ── showing them ─────────────────────────────────────────────────────────────
-const TAGS = { ct: 'CT', atl: 'ATL', all: 'ALL' };
+const TAGS = { ct: 'CENTRAL TOOLING', mv: 'CT SHIPMENTS', co: 'CHECKED-OUT TOOLS', atl: 'ALL OF ATL', act: 'TOOL ROOMS', tg: 'OUR GOALS', all: 'THE BIG PICTURE' };
 function countUps(root) {
   root.querySelectorAll('.hero .v, .tile .v').forEach(el => {
     const txt = el.textContent, m = txt.match(/^(\$?)([\d,.]+)([KM%]?)$/); if (!m) return;
@@ -214,8 +317,9 @@ function countUps(root) {
 }
 function show(i) {
   i = Math.floor(i / cols) * cols; cur = i;
-  document.querySelectorAll('.scr').forEach((e, k) => {
-    const on = k >= i && k < i + cols, dest = (mode === 'mixed' && k === i + 1) ? $('#stage2') : $('#stage');
+  const nS = scrEls.length;
+  scrEls.forEach((e, k) => {
+    const rel = (k - i + nS) % nS, on = rel < cols, dest = (mode === 'mixed' && rel === 1) ? $('#stage2') : $('#stage');
     if (e.parentNode !== dest) dest.appendChild(e);
     if (on && !e.classList.contains('on')) countUps(e); e.classList.toggle('on', on); });
 }
@@ -223,7 +327,8 @@ function mount() {
   const t = new Date(D.asOf), hrs = (Date.now() - t.getTime()) / 36e5;
   const lbl = t.toLocaleString('en-US', { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' });
   const asof = hrs > 36 ? `<span class="stale">Numbers are ${Math.floor(hrs / 24)} day${hrs >= 48 ? 's' : ''} old</span>` : 'Updated ' + lbl;
-  $('#stage').innerHTML = screens.map((s, i) => `<section class="scr ${s.tag}"><div class="top"><span class="tag">${TAGS[s.tag]}</span><div class="ttl">${esc(s.t)}</div></div><div class="body">${s.h}</div><div class="foot">${asof}</div></section>`).join('');
+  $('#stage').innerHTML = screens.map((s, i) => `<section class="scr ${s.tag}"><div class="top"><span class="tag">${TAGS[s.tag]}</span><div class="ttl">${esc(s.t)}</div></div><div class="sub">${esc(s.sub || '')}</div><div class="body">${s.h}</div><div class="foot">${asof}</div></section>`).join('');
+  scrEls = [...document.querySelectorAll('#stage .scr')];
   show(cur);
   if (timer) clearInterval(timer);
   timer = setInterval(() => show((cur + cols) % screens.length), ROTATE_SEC * 1000);
