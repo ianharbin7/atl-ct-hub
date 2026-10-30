@@ -18,76 +18,85 @@
 
   /* right: one simple screen at a time */
   .side { position: relative; padding: 1.4vh .9vw 1.4vh 0; display: flex; flex-direction: column; min-width: 0; }
-  .stage { position: relative; flex: 1; min-height: 0; }
-  .scr { position: absolute; inset: 0; display: flex; flex-direction: column; background: var(--card); border: 1px solid var(--line); border-radius: 1.2vw; padding: 2.4vh 1.6vw; opacity: 0; transform: translateY(1.5vh); visibility: hidden; transition: opacity .7s, transform .7s, visibility .7s; overflow: hidden; }
-  .scr.on { opacity: 1; transform: none; visibility: visible; }
+  .stage { position: relative; flex: 1; min-height: 0; display: grid; grid-template-columns: repeat(var(--cols, 1), 1fr); gap: .8vw; }
+  .wrap.stack { grid-template-columns: 1fr; grid-template-rows: var(--bh, 30vh) 1fr; gap: .6vh; }
+  .wrap.stack .side { padding: 0 .9vw 1.2vh .9vw; }
+  #stage2 { display: none; }
+  .wrap.mixed { grid-template-rows: var(--bh, 50vh) 1fr; gap: .6vh .8vw; }
+  .wrap.mixed #bframe { grid-area: 1 / 1; }
+  .wrap.mixed .side { grid-area: 1 / 2 / 3 / 3; }
+  .wrap.mixed #stage2 { grid-area: 2 / 1; display: grid; padding: 0 0 1.2vh 0; min-height: 0; }
+  .scr { position: relative; display: none; container-type: size; flex-direction: column; background: var(--card); border: 1px solid var(--line); border-radius: 1.2vw; padding: 2.4vh 1.6vw; overflow: hidden; }
+  .scr.on { display: flex; animation: scrin .7s ease-out; }
+  @keyframes scrin { from { opacity: 0; transform: translateY(1.5vh); } to { opacity: 1; transform: none; } }
   .scr::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: .5vw; background: var(--c); }
   .scr.ct { --c: #ef4444; } .scr.atl { --c: #38bdf8; } .scr.all { --c: #22c55e; }
-  .top { display: flex; align-items: center; gap: 1vw; flex: none; margin-bottom: 2vh; }
-  .tag { padding: .5vh 1.1vw; border-radius: 999px; font-size: 2.2vh; font-weight: 800; letter-spacing: .14em; color: #fff; background: var(--c); }
-  .ttl { font-size: 4vh; font-weight: 800; letter-spacing: .02em; line-height: 1.1; }
+  .top { display: flex; align-items: center; gap: 1.78cqh; flex: none; margin-bottom: 2cqh; }
+  .tag { padding: .5cqh 1.96cqh; border-radius: 999px; font-size: 2.2cqh; font-weight: 800; letter-spacing: .14em; color: #fff; background: var(--c); }
+  .ttl { font-size: 4cqh; font-weight: 800; letter-spacing: .02em; line-height: 1.1; }
     .stale { color: var(--amber); font-weight: 700; }
-  .body { flex: 1; min-height: 0; display: flex; flex-direction: column; gap: 2.6vh; justify-content: space-evenly; }
-  .foot { flex: none; margin-top: 1.2vh; font-size: 1.9vh; color: var(--mut); text-align: right; }
+  .body { flex: 1; min-height: 0; display: flex; flex-direction: column; gap: 2.6cqh; justify-content: space-evenly; }
+  .foot { flex: none; margin-top: 1.2cqh; font-size: 1.9cqh; color: var(--mut); text-align: right; }
 
   /* big number */
-  .hero { display: flex; flex-direction: column; gap: .8vh; }
-  .hero .l { font-size: 2.6vh; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--mut); }
-  .hero .v { font-size: 19vh; font-weight: 800; line-height: .95; font-variant-numeric: tabular-nums; letter-spacing: -.02em; }
-  .hero .v.m { font-size: 15vh; }
-  .chip { align-self: flex-start; display: inline-flex; align-items: center; gap: .6vw; margin-top: 1.2vh; padding: .8vh 1.3vw; border-radius: 999px; font-size: 3.2vh; font-weight: 800; }
+  .hero { display: flex; flex-direction: column; gap: .8cqh; }
+  .hero .l { font-size: 2.6cqh; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--mut); }
+  .hero .v { font-size: 19cqh; font-weight: 800; line-height: .95; font-variant-numeric: tabular-nums; letter-spacing: -.02em; }
+  .hero .v.m { font-size: 15cqh; }
+  .chip { align-self: flex-start; display: inline-flex; align-items: center; gap: 1.07cqh; margin-top: 1.2cqh; padding: .8cqh 2.31cqh; border-radius: 999px; font-size: 3.2cqh; font-weight: 800; }
   .chip.good { background: rgba(34,197,94,.18); color: #6ee7a0; } .chip.bad { background: rgba(239,68,68,.2); color: #ff8a8a; } .chip.flat { background: rgba(134,163,194,.15); color: var(--mut); }
-  .tiles { display: grid; grid-template-columns: repeat(var(--n, 3), 1fr); gap: 1vw; }
-  .tile { background: #0f2238; border: 1px solid var(--line); border-radius: 1vw; padding: 1.8vh 1vw; min-width: 0; }
-  .tiles[style*="--n:3"] .tile .v { font-size: 4.2vh; }
-  .tile .v { white-space: nowrap; font-size: 6vh; font-weight: 800; line-height: 1; font-variant-numeric: tabular-nums; }
-  .tiles[style*="--n:2"] .tile .v { font-size: 7vh; }
-  .tile .l { margin-top: 1vh; font-size: 2.1vh; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--mut); }
-  .tile .s { margin-top: .5vh; font-size: 2.1vh; color: #b5cbe2; }
+  .tiles { display: grid; grid-template-columns: repeat(var(--n, 3), 1fr); gap: 1.78cqh; }
+  .tile { background: #0f2238; border: 1px solid var(--line); border-radius: 1.78cqh; padding: 1.8cqh 1.78cqh; min-width: 0; }
+  .tiles[style*="--n:3"] .tile .v { font-size: 4.2cqh; }
+  .tile .v { white-space: nowrap; font-size: 6cqh; font-weight: 800; line-height: 1; font-variant-numeric: tabular-nums; }
+  .tiles[style*="--n:2"] .tile .v { font-size: 7cqh; }
+  .tile .l { margin-top: 1cqh; font-size: 2.1cqh; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--mut); }
+  .tile .s { margin-top: .5cqh; font-size: 2.1cqh; color: #b5cbe2; }
   .tile.red .v { color: #ff7b7b; } .tile.amber .v { color: #fbbf24; } .tile.green .v { color: #5eea96; }
 
   /* bars */
-  .bars { flex: 1; display: flex; flex-direction: column; justify-content: space-evenly; gap: 1vh; }
-  .bar .r1 { display: flex; align-items: baseline; justify-content: space-between; gap: 1vw; margin-bottom: .8vh; }
-  .bar .n { font-size: 3.9vh; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .bar .x { font-size: 4.2vh; font-weight: 800; font-variant-numeric: tabular-nums; white-space: nowrap; }
-  .bar .x small { margin-left: .6vw; font-size: 2.2vh; font-weight: 600; color: var(--mut); }
-  .bar .t { height: 3vh; background: #12263d; border-radius: 99px; overflow: hidden; }
+  .bars { flex: 1; display: flex; flex-direction: column; justify-content: space-evenly; gap: 1cqh; }
+  .bar .r1 { display: flex; align-items: baseline; justify-content: space-between; gap: 1.78cqh; margin-bottom: .8cqh; }
+  .bar .n { font-size: 3.9cqh; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .bar .x { font-size: 4.2cqh; font-weight: 800; font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .bar .x small { margin-left: 1.07cqh; font-size: 2.2cqh; font-weight: 600; color: var(--mut); }
+  .bar .t { height: 3cqh; background: #12263d; border-radius: 99px; overflow: hidden; }
   .bar .t b { display: block; height: 100%; border-radius: 99px; background: linear-gradient(90deg, #1d6fc4, #38bdf8); width: 0; transition: width 1.1s cubic-bezier(.2,.7,.2,1); }
   .scr.on .bar .t b { width: var(--w); }
   .bar.g .t b { background: linear-gradient(90deg, #15803d, #4ade80); } .bar.y .t b { background: linear-gradient(90deg, #ca8a04, #facc15); }
   .bar.o .t b { background: linear-gradient(90deg, #c2410c, #fb923c); } .bar.r .t b { background: linear-gradient(90deg, #b91c1c, #f87171); }
 
   /* table */
-  .rows { flex: 1; display: flex; flex-direction: column; justify-content: space-evenly; gap: 1vh; }
-  .row { display: grid; grid-template-columns: 1fr auto; align-items: center; gap: 1vw; background: #0f2238; border: 1px solid var(--line); border-radius: 1vw; padding: 2.6vh 1.4vw; }
-  .row .a { font-size: 4vh; font-weight: 800; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .row .a small { display: block; margin-top: .3vh; font-size: 2vh; font-weight: 500; color: var(--mut); overflow: hidden; text-overflow: ellipsis; }
-  .row .b { font-size: 4.2vh; font-weight: 800; font-variant-numeric: tabular-nums; text-align: right; white-space: nowrap; }
+  .rows { flex: 1; display: flex; flex-direction: column; justify-content: space-evenly; gap: 1cqh; }
+  .row { display: grid; grid-template-columns: 1fr auto; align-items: center; gap: 1.78cqh; background: #0f2238; border: 1px solid var(--line); border-radius: 1.78cqh; padding: 2.6cqh 2.49cqh; }
+  .row .a { font-size: 4cqh; font-weight: 800; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .row .a small { display: block; margin-top: .3cqh; font-size: 2cqh; font-weight: 500; color: var(--mut); overflow: hidden; text-overflow: ellipsis; }
+  .row .b { font-size: 4.2cqh; font-weight: 800; font-variant-numeric: tabular-nums; text-align: right; white-space: nowrap; }
   .row .b.red { color: #ff7b7b; } .row .b.amber { color: #fbbf24; }
-  .note { font-size: 2.8vh; color: var(--mut); line-height: 1.35; }
+  .note { font-size: 2.8cqh; color: var(--mut); line-height: 1.35; }
 
   /* gauge */
-  .gauge { display: flex; align-items: center; gap: 2vw; }
-  .gauge svg { width: 30vh; height: 30vh; flex: none; }
+  .gauge { display: flex; align-items: center; gap: 3.56cqh; }
+  .gauge svg { width: 30cqh; height: 30cqh; flex: none; }
   .gauge .gv { font-size: 31px; font-weight: 800; fill: #fff; }
-  .gtxt { display: flex; flex-direction: column; gap: 1.2vh; }
+  .gtxt { display: flex; flex-direction: column; gap: 1.2cqh; }
 
   /* chart */
   .chartbox { flex: 1; min-height: 0; display: flex; align-items: center; }
   .chartbox svg { width: 100%; height: 100%; }
 
   /* plain words */
-  .says { flex: 1; display: flex; flex-direction: column; justify-content: space-evenly; gap: 2.2vh; }
-  .say { background: #0f2238; border: 1px solid var(--line); border-radius: 1vw; padding: 2vh 1.4vw; }
-  .say b { display: block; font-size: 2.2vh; letter-spacing: .1em; text-transform: uppercase; color: var(--blue); margin-bottom: .7vh; }
-  .say span { font-size: 3vh; line-height: 1.3; font-weight: 500; }
-  .empty { margin: auto; font-size: 3vh; color: var(--mut); text-align: center; }
+  .says { flex: 1; display: flex; flex-direction: column; justify-content: space-evenly; gap: 2.2cqh; }
+  .say { background: #0f2238; border: 1px solid var(--line); border-radius: 1.78cqh; padding: 2cqh 2.49cqh; }
+  .say b { display: block; font-size: 2.2cqh; letter-spacing: .1em; text-transform: uppercase; color: var(--blue); margin-bottom: .7cqh; }
+  .say span { font-size: 3cqh; line-height: 1.3; font-weight: 500; }
+  .empty { margin: auto; font-size: 3cqh; color: var(--mut); text-align: center; }
 </style>
 </head>
 <body>
 <div class="wrap">
   <div id="bframe"><iframe id="bf" title="Live Board" scrolling="no"></iframe></div>
+  <div id="stage2"></div>
   <div class="side"><div class="stage" id="stage"><div class="empty">Loading the numbers…</div></div></div>
 </div>
 
@@ -108,7 +117,7 @@ const title = s => String(s || '').toLowerCase().replace(/\b[a-z]/g, c => c.toUp
 const holder = n => { n = String(n || '').replace(/^\d+\w*\s+/, '') || String(n || ''); return /^\(?blank\)?$/i.test(n) ? 'Unassigned' : n; };
 const cut = (s, n) => { s = String(s || ''); return s.length > n ? s.slice(0, n - 1) + '…' : s; };
 
-let D = null, cur = 0, screens = [], timer = null;
+let D = null, cur = 0, screens = [], timer = null, cols = 1, board = null;
 
 // ── building blocks ──────────────────────────────────────────────────────────
 const hero = (label, val, chip, cls, big) => `<div class="hero"><div class="l">${esc(label)}</div><div class="v${big ? ' m' : ''}">${val}</div>${chip ? `<div class="chip ${cls || 'flat'}">${chip}</div>` : ''}</div>`;
@@ -204,29 +213,57 @@ function countUps(root) {
   });
 }
 function show(i) {
-  cur = i;
-  document.querySelectorAll('.scr').forEach((e, k) => { const on = k === i; if (on && !e.classList.contains('on')) countUps(e); e.classList.toggle('on', on); });
+  i = Math.floor(i / cols) * cols; cur = i;
+  document.querySelectorAll('.scr').forEach((e, k) => {
+    const on = k >= i && k < i + cols, dest = (mode === 'mixed' && k === i + 1) ? $('#stage2') : $('#stage');
+    if (e.parentNode !== dest) dest.appendChild(e);
+    if (on && !e.classList.contains('on')) countUps(e); e.classList.toggle('on', on); });
 }
 function mount() {
-  const keep = Math.min(cur, Math.max(0, screens.length - 1));
   const t = new Date(D.asOf), hrs = (Date.now() - t.getTime()) / 36e5;
   const lbl = t.toLocaleString('en-US', { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' });
   const asof = hrs > 36 ? `<span class="stale">Numbers are ${Math.floor(hrs / 24)} day${hrs >= 48 ? 's' : ''} old</span>` : 'Updated ' + lbl;
   $('#stage').innerHTML = screens.map((s, i) => `<section class="scr ${s.tag}"><div class="top"><span class="tag">${TAGS[s.tag]}</span><div class="ttl">${esc(s.t)}</div></div><div class="body">${s.h}</div><div class="foot">${asof}</div></section>`).join('');
-  show(keep);
+  show(cur);
   if (timer) clearInterval(timer);
-  timer = setInterval(() => show((cur + 1) % screens.length), ROTATE_SEC * 1000);
+  timer = setInterval(() => show((cur + cols) % screens.length), ROTATE_SEC * 1000);
 }
 
 // ── live board (left): the board's own TV view, scaled to the box ────────────
-const BASE_W = 1320;
+let mode = 'side';
+const BASE_SIDE = 1320, BASE_STACK = 1500, H_VIRT = 1000;
 function fitBoard() {
-  const box = $('#bframe'), f = $('#bf'), w = box.clientWidth, h = box.clientHeight; if (!w || !h) return;
-  const k = w / BASE_W;
-  f.style.width = BASE_W + 'px'; f.style.height = Math.ceil(h / k) + 'px'; f.style.transform = 'scale(' + k + ')';
+  const wrap = $('.wrap'), box = $('#bframe'), f = $('#bf'), W = wrap.clientWidth, Hh = wrap.clientHeight;
+  if (mode === 'side') {
+    const w = box.clientWidth, h = box.clientHeight; if (!w || !h) return 0;
+    const k = w / BASE_SIDE;
+    f.style.width = BASE_SIDE + 'px'; f.style.height = Math.ceil(h / k) + 'px'; f.style.transform = 'scale(' + k + ')';
+    return 0;
+  }
+  const base = mode === 'stack' ? BASE_STACK : BASE_SIDE, k = (mode === 'stack' ? W : box.clientWidth || W * 0.61) / base;
+  const ok = board && Math.abs(board.W - base) < 3 && Math.abs(board.H - H_VIRT) < 3;
+  const bandH = Math.min(Hh * 0.6, (ok ? board.need * k : Hh * 0.35) + Hh * 0.015);
+  wrap.style.setProperty('--bh', bandH + 'px');
+  f.style.width = base + 'px'; f.style.height = H_VIRT + 'px'; f.style.transform = 'scale(' + k + ')';
+  return bandH;
 }
-$('#bf').src = BOARD + '/?tv';
-addEventListener('resize', fitBoard);
+// the board tells us how many shipments it is showing; the fewer there are, the more room the metrics get
+function applyLayout() {
+  const n = board ? board.n : 99;
+  const want = n <= 2 ? 'stack' : n <= 4 ? 'mixed' : 'side';
+  const was = mode; mode = want;
+  const wrap = $('.wrap'); wrap.classList.toggle('stack', mode === 'stack'); wrap.classList.toggle('mixed', mode === 'mixed');
+  const bandH = fitBoard(), Hh = wrap.clientHeight;
+  const c = mode === 'stack' ? ((Hh - bandH) / Hh >= 0.5 ? 3 : 2) : mode === 'mixed' ? 2 : 1;
+  if (c !== cols || was !== mode) { cols = c; $('#stage').style.setProperty('--cols', mode === 'mixed' ? 1 : cols); if (screens.length) { show(cur); if (timer) { clearInterval(timer); timer = setInterval(() => show((cur + cols) % screens.length), ROTATE_SEC * 1000); } } }
+}
+addEventListener('message', e => {
+  const d = e.data; if (!d || !d.ctb) return;
+  if (e.origin !== BOARD && !/^http:\/\/localhost(:\d+)?$/.test(e.origin)) return;
+  board = d; applyLayout();
+});
+$('#bf').src = BOARD + '/?tv&bare';
+addEventListener('resize', applyLayout);
 
 async function loadData() {
   try { const r = await fetch(BOARD + '/api/dashboard', { cache: 'no-store' }); if (r.ok) { const d = await r.json(); if (d && d.ct) { try { localStorage.setItem('ctwall-data', JSON.stringify(d)); } catch (e) {} return d; } } } catch (e) {}
@@ -240,9 +277,9 @@ async function refresh() {
   sig = s; D = d; screens = buildScreens(); mount();
 }
 (async function () {
-  fitBoard(); await refresh();
+  applyLayout(); await refresh();
   setInterval(refresh, 5 * 60 * 1000);
-  document.addEventListener('visibilitychange', () => { if (!document.hidden) { refresh(); fitBoard(); } });
+  document.addEventListener('visibilitychange', () => { if (!document.hidden) { refresh(); applyLayout(); } });
 })();
 </script>
 </body>
