@@ -45,13 +45,13 @@
   .hero .v.m { font-size: 15cqh; }
   .chip { align-self: flex-start; display: inline-flex; align-items: center; gap: 1.07cqh; margin-top: 1.2cqh; padding: .8cqh 2.31cqh; border-radius: 999px; font-size: 3.2cqh; font-weight: 800; }
   .chip.good { background: rgba(34,197,94,.18); color: #6ee7a0; } .chip.bad { background: rgba(239,68,68,.2); color: #ff8a8a; } .chip.flat { background: rgba(134,163,194,.15); color: var(--mut); }
-  .tiles { display: grid; grid-template-columns: repeat(var(--n, 3), 1fr); gap: 1.78cqh; }
-  .tile { background: #0f2238; border: 1px solid var(--line); border-radius: 1.78cqh; padding: 1.8cqh 1.78cqh; min-width: 0; }
-  .tiles[style*="--n:3"] .tile .v { font-size: 4.2cqh; }
-  .tile .v { white-space: nowrap; font-size: 6cqh; font-weight: 800; line-height: 1; font-variant-numeric: tabular-nums; }
-  .tiles[style*="--n:2"] .tile .v { font-size: 7cqh; }
-  .tile .l { margin-top: 1cqh; font-size: 2.1cqh; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--mut); }
-  .tile .s { margin-top: .5cqh; font-size: 2.1cqh; color: #b5cbe2; }
+  .tiles { flex: 1 1 0; min-height: 0; display: grid; grid-template-columns: repeat(var(--n, 3), 1fr); grid-auto-rows: minmax(0, 1fr); gap: 1.78cqh; }
+  .body:has(.rows) > .tiles, .body:has(.bars) > .tiles, .body:has(.gauge) > .tiles, .body:has(.chartbox) > .tiles, .body:has(.says) > .tiles { flex: none; height: 20cqh; }
+  .tile { container-type: size; display: flex; flex-direction: column; justify-content: center; overflow: hidden; background: #0f2238; border: 1px solid var(--line); border-radius: 1.78cqh; padding: 0 1.78cqh; min-width: 0; }
+  .tile .v { white-space: nowrap; font-size: min(38cqh, 17cqw); font-weight: 800; line-height: 1.02; font-variant-numeric: tabular-nums; }
+  .tile .l { margin-top: 5cqh; font-size: min(14cqh, 6.4cqw); font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--mut); line-height: 1.15; }
+  .tile .s { margin-top: 3cqh; font-size: min(13cqh, 6cqw); color: #b5cbe2; line-height: 1.15; }
+  @container (aspect-ratio < 1) { .tiles { grid-template-columns: 1fr; } .body:has(.rows) > .tiles, .body:has(.bars) > .tiles, .body:has(.gauge) > .tiles, .body:has(.chartbox) > .tiles, .body:has(.says) > .tiles { height: calc(var(--n, 3) * 11cqh); } }
   .tile.red .v { color: #ff7b7b; } .tile.amber .v { color: #fbbf24; } .tile.green .v { color: #5eea96; }
 
   /* bars */
@@ -374,7 +374,7 @@ function fitBoard() {
   }
   const base = mode === 'stack' ? BASE_STACK : BASE_SIDE, k = (mode === 'stack' ? W : box.clientWidth || W * 0.61) / base;
   const ok = board && Math.abs(board.W - base) < 3 && Math.abs(board.H - H_VIRT) < 3;
-  const bandH = Math.min(Hh * 0.6, (ok ? board.need * k : Hh * 0.35) + Hh * 0.015);
+  const bandH = Math.min(Hh * 0.72, (ok ? board.need * k : Hh * 0.35) + Hh * 0.015);
   wrap.style.setProperty('--bh', bandH + 'px');
   f.style.width = base + 'px'; f.style.height = H_VIRT + 'px'; f.style.transform = 'scale(' + k + ')';
   return bandH;
@@ -382,7 +382,12 @@ function fitBoard() {
 // the board tells us how many shipments it is showing; the fewer there are, the more room the metrics get
 function applyLayout() {
   const n = board ? board.n : 99;
-  const want = n <= 2 ? 'stack' : n <= 4 ? 'mixed' : 'side';
+  let want = n <= 2 ? 'stack' : n <= 4 ? 'mixed' : 'side';
+  // five or six rows still fit in the top band, so keep the metrics panel under them instead of leaving that space empty
+  if (want === 'side' && board && Math.abs(board.W - BASE_SIDE) < 3) {
+    const Hh0 = $('.wrap').clientHeight, k0 = ($('.wrap').clientWidth * 0.61) / BASE_SIDE;
+    if (board.need * k0 + Hh0 * 0.015 <= Hh0 * 0.72) want = 'mixed';
+  }
   const was = mode; mode = want;
   const wrap = $('.wrap'); wrap.classList.toggle('stack', mode === 'stack'); wrap.classList.toggle('mixed', mode === 'mixed');
   const bandH = fitBoard(), Hh = wrap.clientHeight;
