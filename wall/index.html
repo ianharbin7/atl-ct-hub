@@ -83,13 +83,22 @@
 
   /* chart */
   .chartbox { flex: 1; min-height: 0; display: flex; align-items: center; }
-  .chartbox svg { width: 100%; height: 100%; }
+  .chartbox .cs { width: 100%; height: 100%; min-height: 0; }
+  .chartbox svg { width: 100%; height: 100%; display: block; }
+
+  /* wide, short panels: dial + tiles on the left, graph fills the right */
+  @container (aspect-ratio > 1.45) {
+    .body:has(.gauge):has(.chartbox) { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.5fr); grid-template-rows: auto minmax(0, 1fr); gap: 2cqh 2.5cqw; align-content: stretch; }
+    .body:has(.gauge):has(.chartbox) > .gauge { grid-column: 1; grid-row: 1; }
+    .body:has(.gauge):has(.chartbox) > .tiles { grid-column: 1; grid-row: 2; height: auto; }
+    .body:has(.gauge):has(.chartbox) > .chartbox { grid-column: 2; grid-row: 1 / 3; }
+  }
 
   /* plain words */
-  .says { flex: 1; display: flex; flex-direction: column; justify-content: space-evenly; gap: 2.2cqh; }
-  .say { background: #0f2238; border: 1px solid var(--line); border-radius: 1.78cqh; padding: 2cqh 2.49cqh; }
-  .say b { display: block; font-size: 2.2cqh; letter-spacing: .1em; text-transform: uppercase; color: var(--blue); margin-bottom: .7cqh; }
-  .say span { font-size: 3cqh; line-height: 1.3; font-weight: 500; }
+  .says { flex: 1; min-height: 0; display: flex; flex-direction: column; gap: 2.2cqh; }
+  .say { flex: 1 1 0; min-height: 0; display: flex; flex-direction: column; justify-content: center; overflow: hidden; background: #0f2238; border: 1px solid var(--line); border-radius: 1.78cqh; padding: 1.5cqh 2.6cqh; }
+  .say b { display: block; font-size: min(3cqh, 3.2cqw); letter-spacing: .1em; text-transform: uppercase; color: var(--blue); margin-bottom: .7cqh; }
+  .say span { font-size: min(5.2cqh, 5.6cqw); line-height: 1.22; font-weight: 600; }
   .empty { margin: auto; font-size: 3cqh; color: var(--mut); text-align: center; }
   .scr.cr .row .a small { white-space: normal; line-height: 1.25; }
   .scr.cr { --c: #fb923c; } .scr.mv { --c: #a78bfa; } .scr.co { --c: #f59e0b; } .scr.act { --c: #2dd4bf; } .scr.tg { --c: #f472b6; }
@@ -146,9 +155,26 @@ function gauge(p) {
 }
 
 // one clean line chart; the vertical scale is fixed or rounded to nice numbers so labels never run past what makes sense
+const CHARTS = [];
 function chart(points, key, color, fmt, fixed, dims) {
   if (!points || points.length < 2) return '<div class="empty">Not enough history yet</div>';
-  const W = 800, H = dims ? dims[1] : 900, pad = { l: 140, r: 36, t: 30, b: 64 };
+  CHARTS.push([points, key, color, fmt, fixed]);
+  return '<div class="cs" data-ch="' + (CHARTS.length - 1) + '">' + chartSvg(CHARTS.length - 1, 800, 700) + '</div>';
+}
+// charts redraw to match the real shape of their box, so wide panels get a wide graph
+function fitCharts() {
+  document.querySelectorAll('.cs[data-ch]').forEach(el => {
+    const w = el.clientWidth, h = el.clientHeight; if (w < 20 || h < 20) return;
+    const H = 700, W = Math.max(380, Math.min(3200, Math.round(H * w / h)));
+    if (el.dataset.w === String(W)) return; el.dataset.w = W;
+    el.innerHTML = chartSvg(+el.dataset.ch, W, H);
+  });
+}
+if (window.ResizeObserver) new ResizeObserver(() => fitCharts()).observe(document.documentElement);
+setInterval(fitCharts, 1500);
+function chartSvg(ci, W, H) {
+  const [points, key, color, fmt, fixed] = CHARTS[ci];
+  const pad = { l: 200, r: 40, t: 34, b: 60 };
   const vals = points.map(p => p[key]);
   let lo, hi;
   if (fixed) { lo = fixed[0]; hi = fixed[1]; }
@@ -156,7 +182,7 @@ function chart(points, key, color, fmt, fixed, dims) {
   const X = i => pad.l + i * (W - pad.l - pad.r) / (points.length - 1);
   const Y = v => pad.t + (hi - v) * (H - pad.t - pad.b) / (hi - lo);
   let g = '';
-  for (let i = 0; i <= 4; i++) { const v = lo + (hi - lo) * i / 4, y = Y(v); g += `<line x1="${pad.l}" x2="${W - pad.r}" y1="${y}" y2="${y}" stroke="#1a3452"/><text x="${pad.l - 16}" y="${y + 11}" text-anchor="end" font-size="36" fill="#9bb7d4">${fmt(v)}</text>`; }
+  for (let i = 0; i <= 4; i++) { const v = lo + (hi - lo) * i / 4, y = Y(v); g += `<line x1="${pad.l}" x2="${W - pad.r}" y1="${y}" y2="${y}" stroke="#1a3452"/><text x="${pad.l - 16}" y="${y + 11}" text-anchor="end" font-size="40" fill="#9bb7d4">${fmt(v)}</text>`; }
   const path = points.map((p, i) => (i ? 'L' : 'M') + X(i).toFixed(1) + ',' + Y(p[key]).toFixed(1)).join(' ');
   const md = d => { const p = d.split('-'); return p.length < 3 || d.length <= 7 ? ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][+p[1] - 1] : +p[1] + '/' + +p[2]; };
   const last = points.length - 1, mid = Math.floor(last / 2);
@@ -164,15 +190,16 @@ function chart(points, key, color, fmt, fixed, dims) {
     <path d="${path} L${X(last)},${H - pad.b} L${X(0)},${H - pad.b} Z" fill="${color}" opacity=".16"/>
     <path d="${path}" fill="none" stroke="${color}" stroke-width="8" stroke-linejoin="round" stroke-linecap="round"/>
     <circle cx="${X(last)}" cy="${Y(vals[last])}" r="13" fill="${color}" stroke="#0b1a2c" stroke-width="4"/>
-    <text x="${X(0)}" y="${H - 14}" font-size="32" fill="#9bb7d4" text-anchor="start">${md(points[0].d)}</text>
-    <text x="${X(mid)}" y="${H - 14}" font-size="32" fill="#9bb7d4" text-anchor="middle">${md(points[mid].d)}</text>
-    <text x="${X(last)}" y="${H - 14}" font-size="32" fill="#9bb7d4" text-anchor="end">${md(points[last].d)}</text></svg>`;
+    <text x="${X(0)}" y="${H - 12}" font-size="36" fill="#9bb7d4" text-anchor="start">${md(points[0].d)}</text>
+    <text x="${X(mid)}" y="${H - 12}" font-size="36" fill="#9bb7d4" text-anchor="middle">${md(points[mid].d)}</text>
+    <text x="${X(last)}" y="${H - 12}" font-size="36" fill="#9bb7d4" text-anchor="end">${md(points[last].d)}</text></svg>`;
 }
 const bandCls = n => /MONITOR/.test(n) ? 'g' : /CONTACT/.test(n) ? 'y' : /FOLLOW/.test(n) ? 'o' : /CRITICAL|UNACCEPT/.test(n) ? 'r' : '';
 const ageCls = n => /OVER/.test(n) ? 'r' : /91/.test(n) ? 'o' : /31/.test(n) ? 'y' : /CLOCK/.test(n) ? '' : 'g';
 
 // ── the screens (one idea each, big enough to read from across the room) ─────
 function buildScreens() {
+  CHARTS.length = 0;
   const ct = D.ct || {}, atl = D.atl || {}, all = D.all || {}, tr = D.trend || [], f = tr[0] || {}, X = D.x || {};
   const L = all.lines || [], hd = all.headline || [], oc = ct.outreach || {}, sb = ct.sinceBaseline || {};
   const S = [];
