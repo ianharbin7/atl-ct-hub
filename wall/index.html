@@ -88,7 +88,7 @@
 
   /* wide, short panels: dial + tiles on the left, graph fills the right */
   @container (aspect-ratio > 1.45) {
-    .body:has(.gauge):has(.chartbox) { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.5fr); grid-template-rows: auto minmax(0, 1fr); gap: 2cqh 2.5cqw; align-content: stretch; }
+    .body:has(.gauge):has(.chartbox) { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.9fr); grid-template-rows: auto minmax(0, 1fr); gap: 2cqh 2.5cqw; align-content: stretch; }
     .body:has(.gauge):has(.chartbox) > .gauge { grid-column: 1; grid-row: 1; }
     .body:has(.gauge):has(.chartbox) > .tiles { grid-column: 1; grid-row: 2; height: auto; }
     .body:has(.gauge):has(.chartbox) > .chartbox { grid-column: 2; grid-row: 1 / 3; }
@@ -174,7 +174,7 @@ if (window.ResizeObserver) new ResizeObserver(() => fitCharts()).observe(documen
 setInterval(fitCharts, 1500);
 function chartSvg(ci, W, H) {
   const [points, key, color, fmt, fixed] = CHARTS[ci];
-  const pad = { l: 200, r: 40, t: 34, b: 60 };
+  const pad = { l: 172, r: 16, t: 34, b: 60 };
   const vals = points.map(p => p[key]);
   let lo, hi;
   if (fixed) { lo = fixed[0]; hi = fixed[1]; }
