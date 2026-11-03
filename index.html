@@ -88,15 +88,10 @@ main { padding: 12px 12px calc(30px + env(safe-area-inset-bottom)); display: fle
 .btns > *[disabled] { opacity: .55; pointer-events: none; }
 .sd { display: block; margin: 10px auto 0; border: 0; background: transparent; color: #f19a9a; font: inherit; font-weight: 700; font-size: 13px; padding: 8px 12px; text-decoration: underline; text-underline-offset: 3px; }
 .none { position: relative; text-align: center; padding: 26px 10px 10px; color: var(--mut); }
-.none .scene { position: relative; width: 220px; height: 220px; margin: 0 auto 6px; }
-.none .ring { position: absolute; inset: 0; border-radius: 50%; border: 1.5px solid #1f4a73; }
-.none .ring.r2 { inset: 36px; } .none .ring.r3 { inset: 72px; border-style: dashed; }
-.none .sweep { position: absolute; inset: 0; border-radius: 50%; background: conic-gradient(from 0deg, rgba(56,189,248,0) 0 270deg, rgba(56,189,248,.5) 358deg, rgba(150,230,255,.95) 360deg); animation: spin 5s linear infinite; mask: radial-gradient(circle, transparent 0 0, #000 0); }
-@keyframes spin { to { transform: rotate(360deg); } }
-.none .orbit { position: absolute; inset: 0; animation: spin 14s linear infinite; }
-.none .orbit svg { position: absolute; top: -8px; left: calc(50% - 15px); width: 30px; height: 24px; fill: #fff; transform: rotate(90deg); filter: drop-shadow(0 2px 3px rgba(0,0,0,.5)); }
-.none .atl { position: absolute; left: calc(50% - 5px); top: calc(50% - 5px); width: 10px; height: 10px; border-radius: 50%; background: #ff5a6e; box-shadow: 0 0 0 0 rgba(255,90,110,.7); animation: lp2 2.4s ease-out infinite; }
-@keyframes lp2 { 0% { box-shadow: 0 0 0 0 rgba(255,90,110,.7); } 70%,100% { box-shadow: 0 0 0 26px rgba(255,90,110,0); } }
+.none .ok { position: relative; width: 84px; height: 84px; margin: 4px auto 14px; border-radius: 50%; background: radial-gradient(circle at 50% 35%, #1f7a4a, #14573a); box-shadow: 0 0 0 0 rgba(34,197,94,.45); animation: okp 3.2s ease-out infinite; display: flex; align-items: center; justify-content: center; }
+.none .ok svg { width: 44px; height: 44px; fill: none; stroke: #eafff3; stroke-width: 5; stroke-linecap: round; stroke-linejoin: round; }
+@keyframes okp { 0% { box-shadow: 0 0 0 0 rgba(34,197,94,.45); } 70%,100% { box-shadow: 0 0 0 22px rgba(34,197,94,0); } }
+.none .sub { font-size: 13px; letter-spacing: .12em; text-transform: uppercase; font-weight: 800; color: #5eea96; margin-bottom: 6px; }
 .none h3 { font-size: 20px; color: #dcebfb; font-weight: 800; }
 .none p { font-size: 14px; margin-top: 6px; min-height: 20px; transition: opacity .6s; }
 .foot { text-align: center; padding: 6px 0 0; }
@@ -223,7 +218,7 @@ function render(force) {
   const s = `<div><b>${rows.length}</b>Open</div><div class="lt${late ? ' bad' : ''}"><b>${late}</b>Late</div><div class="sn${soon ? ' warn' : ''}"><b>${soon}</b>Under 45 min</div>`;
   const t = `<button type="button" class="${tab === 'out' ? 'on' : ''}" data-tab="out">Take to the plane<i>${out.length}</i></button><button type="button" class="${tab === 'in' ? 'on' : ''}" data-tab="in">Go pick up<i>${inn.length}</i></button>`;
   const list = tab === 'out' ? out : inn;
-  const empty = `<div class="none"><div class="scene"><div class="ring"></div><div class="ring r2"></div><div class="ring r3"></div><div class="sweep"></div><div class="orbit">${PLANE}</div><div class="atl"></div></div><h3>Nothing on the board right now</h3><p id="tip">${TIPS[tipN % TIPS.length]}</p></div>`;
+  const empty = `<div class="none"><div class="ok"><svg viewBox="0 0 48 48" aria-hidden="true"><path d="M12 25l8 8 16-18"/></svg></div><div class="sub">All clear</div><h3>Nothing on the board right now</h3><p id="tip">${TIPS[tipN % TIPS.length]}</p></div>`;
   const l = (list.length ? list.map(card).join('') : empty) + `<div class="foot"><a href="${BOARD}" target="_blank" rel="noopener">Open the full Live Board &#8599;</a></div>`;
   if (s !== lastHtml.sum) { $('#sum').innerHTML = s; lastHtml.sum = s; }
   if (t !== lastHtml.tabs) { $('#tabs').innerHTML = t; lastHtml.tabs = t; }
