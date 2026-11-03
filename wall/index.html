@@ -51,6 +51,13 @@
   .tile .v { white-space: nowrap; font-size: min(38cqh, 17cqw); font-weight: 800; line-height: 1.02; font-variant-numeric: tabular-nums; }
   .tile .l { margin-top: 5cqh; font-size: min(14cqh, 6.4cqw); font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--mut); line-height: 1.15; }
   .tile .s { margin-top: 3cqh; font-size: min(13cqh, 6cqw); color: #b5cbe2; line-height: 1.15; }
+  /* in narrow panels the number sits to the left of its label, as big as the box allows (the query only sees .tile, so the rest is passed down through variables) */
+  .tile .v { grid-column: var(--vc, auto); grid-row: var(--vr, auto); font-size: var(--vf, min(38cqh, 17cqw)); }
+  .tile .l { grid-column: var(--lc, auto); grid-row: var(--lr, auto); margin-top: var(--lm, 5cqh); align-self: var(--la, auto); font-size: var(--lf, min(14cqh, 6.4cqw)); }
+  .tile .s { grid-column: var(--lc, auto); grid-row: var(--sr, auto); margin-top: var(--sm, 3cqh); align-self: var(--sa, auto); font-size: var(--sf, min(13cqh, 6cqw)); }
+  .tile .l:last-child { grid-row: var(--lr1, auto); align-self: var(--la1, auto); }
+  @container (aspect-ratio < 1) { .tile { display: grid; grid-template-columns: auto minmax(0, 1fr); grid-template-rows: 1fr 1fr; align-items: center; column-gap: 4cqw; row-gap: 0;
+    --vc: 1; --vr: 1 / span 2; --vf: min(68cqh, 14cqw); --lc: 2; --lr: 1; --lm: 0; --la: end; --lf: min(19cqh, 4.6cqw); --sr: 2; --sm: .5cqh; --sa: start; --sf: min(15cqh, 3.8cqw); --lr1: 1 / span 2; --la1: center; } }
   @container (aspect-ratio < 1) { .tiles { grid-template-columns: 1fr; } .body:has(.rows) > .tiles, .body:has(.bars) > .tiles, .body:has(.gauge) > .tiles, .body:has(.chartbox) > .tiles, .body:has(.says) > .tiles { height: calc(var(--n, 3) * 11cqh); } }
   .tile.red .v { color: #ff7b7b; } .tile.amber .v { color: #fbbf24; } .tile.green .v { color: #5eea96; }
 
