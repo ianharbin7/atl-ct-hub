@@ -62,7 +62,22 @@
   .bar .x small { margin-left: 1.07cqh; font-size: 2.2cqh; font-weight: 600; color: var(--mut); }
   .bar .t { height: 3cqh; background: #12263d; border-radius: 99px; overflow: hidden; }
   .bar .t b { display: block; height: 100%; border-radius: 99px; background: linear-gradient(90deg, #1d6fc4, #38bdf8); width: 0; transition: width 1.1s cubic-bezier(.2,.7,.2,1); }
-  .scr.on .bar .t b { width: var(--w); }
+  .bar .t b { width: var(--w); position: relative; overflow: hidden; }
+  .scr.on .bar .t b { animation: barfill 1.3s cubic-bezier(.2,.7,.2,1) both; animation-delay: calc(var(--k, 0) * 110ms + 250ms); }
+  @keyframes barfill { from { width: 0; } }
+  .scr.on .bar .t b::after { content: ''; position: absolute; top: 0; bottom: 0; width: 30%; left: -40%; background: linear-gradient(100deg, transparent, rgba(255,255,255,.45), transparent); animation: barshine 1.1s ease-out both; animation-delay: calc(var(--k, 0) * 110ms + 1.3s); }
+  @keyframes barshine { to { left: 130%; } }
+  .scr.on :is(.tile, .row, .bar .r1, .goal, .say, .hero, .chip) { animation: rise .7s cubic-bezier(.2,.7,.2,1) both; animation-delay: calc(var(--k, 0) * 90ms); }
+  @keyframes rise { from { opacity: 0; transform: translateY(2.2cqh); } }
+  .scr.on .gauge svg circle[stroke="#22c55e"] { animation: gaugefill 1.6s cubic-bezier(.2,.7,.2,1) .2s both; }
+  @keyframes gaugefill { from { stroke-dasharray: 0 400; } }
+  .scr.on .cs svg path.ln { stroke-dasharray: 1; stroke-dashoffset: 0; animation: lndraw 1.8s ease-out .2s both; }
+  @keyframes lndraw { from { stroke-dashoffset: 1; } }
+  .scr.on .cs svg path.ar { animation: arfade 1.2s ease-out 1.1s both; }
+  @keyframes arfade { from { opacity: 0; } }
+  .scr.on .cs svg circle { animation: dotpop .6s cubic-bezier(.2,1.6,.4,1) 1.8s both; transform-box: fill-box; transform-origin: center; }
+  @keyframes dotpop { from { transform: scale(0); } }
+  @media (prefers-reduced-motion: reduce) { .scr.on * { animation: none !important; } }
   .bar.g .t b { background: linear-gradient(90deg, #15803d, #4ade80); } .bar.y .t b { background: linear-gradient(90deg, #ca8a04, #facc15); }
   .bar.o .t b { background: linear-gradient(90deg, #c2410c, #fb923c); } .bar.r .t b { background: linear-gradient(90deg, #b91c1c, #f87171); }
 
@@ -187,8 +202,8 @@ function chartSvg(ci, W, H) {
   const md = d => { const p = d.split('-'); return p.length < 3 || d.length <= 7 ? ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][+p[1] - 1] : +p[1] + '/' + +p[2]; };
   const last = points.length - 1, mid = Math.floor(last / 2);
   return `<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="xMidYMid meet">${g}
-    <path d="${path} L${X(last)},${H - pad.b} L${X(0)},${H - pad.b} Z" fill="${color}" opacity=".16"/>
-    <path d="${path}" fill="none" stroke="${color}" stroke-width="8" stroke-linejoin="round" stroke-linecap="round"/>
+    <path d="${path} L${X(last)},${H - pad.b} L${X(0)},${H - pad.b} Z" class="ar" fill="${color}" opacity=".16"/>
+    <path class="ln" pathLength="1" d="${path}" fill="none" stroke="${color}" stroke-width="8" stroke-linejoin="round" stroke-linecap="round"/>
     <circle cx="${X(last)}" cy="${Y(vals[last])}" r="13" fill="${color}" stroke="#0b1a2c" stroke-width="4"/>
     <text x="${X(0)}" y="${H - 12}" font-size="36" fill="#9bb7d4" text-anchor="start">${md(points[0].d)}</text>
     <text x="${X(mid)}" y="${H - 12}" font-size="36" fill="#9bb7d4" text-anchor="middle">${md(points[mid].d)}</text>
@@ -361,13 +376,17 @@ function buildScreens() {
 // ── showing them ─────────────────────────────────────────────────────────────
 const TAGS = { ct: 'CENTRAL TOOLING', mv: 'CT SHIPMENTS', co: 'CHECKED-OUT TOOLS', atl: 'ALL OF ATL', act: 'TOOL ROOMS', cr: 'OUR TOOL ROOMS', tg: 'OUR GOALS', all: 'THE BIG PICTURE' };
 function countUps(root) {
-  root.querySelectorAll('.hero .v, .tile .v').forEach(el => {
-    const txt = el.textContent, m = txt.match(/^(\$?)([\d,.]+)([KM%]?)$/); if (!m) return;
-    const end = parseFloat(m[2].replace(/,/g, '')), dec = (m[2].split('.')[1] || '').length, t0 = performance.now();
-    const step = t => { const k = Math.min(1, (t - t0) / 900), e = 1 - Math.pow(1 - k, 3), v = end * e;
-      el.textContent = m[1] + (dec ? v.toFixed(dec) : Math.round(v).toLocaleString('en-US')) + m[3]; if (k < 1) requestAnimationFrame(step); else el.textContent = txt; };
+  root.querySelectorAll('.hero .v, .tile .v, .bar .x, .gv, .row .b').forEach(el => {
+    const node = [...el.childNodes].find(n => n.nodeType === 3 && n.nodeValue.trim()); if (!node) return;
+    const txt = node.nodeValue, m = txt.trim().match(/^(\$?)([\d,.]+)([KM%]?)$/); if (!m) return;
+    const end = parseFloat(m[2].replace(/,/g, '')), dec = (m[2].split('.')[1] || '').length, t0 = performance.now() + (el.matches('.bar .x') ? 250 : 0);
+    const step = t => { if (t < t0) { node.nodeValue = m[1] + (0).toFixed(dec) + m[3]; return requestAnimationFrame(step); }
+      const k = Math.min(1, (t - t0) / 1300), e = 1 - Math.pow(1 - k, 3), v = end * e;
+      node.nodeValue = m[1] + (dec ? v.toFixed(dec) : Math.round(v).toLocaleString('en-US')) + m[3]; if (k < 1) requestAnimationFrame(step); else node.nodeValue = txt; };
     requestAnimationFrame(step);
   });
+  ['.tile', '.row', '.bar', '.goal', '.say', '.hero', '.chip'].forEach(sel => root.querySelectorAll(sel).forEach((el, i) => el.style.setProperty('--k', i)));
+  root.querySelectorAll('.bar').forEach((el, i) => { const b = el.querySelector('.t b'); if (b) b.style.setProperty('--k', i); });
 }
 function show(i) {
   i = Math.floor(i / cols) * cols; cur = i;
