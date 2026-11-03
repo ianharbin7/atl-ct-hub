@@ -178,7 +178,7 @@ return 'https://www.delta.com/flightstatus/1/' + parseInt(m[1], 10) + '/' + p.y 
 }
 const PLANE = '<svg viewBox="0 0 120 100" aria-hidden="true"><use href="#jet"/></svg>';
 const pending = new Set(); let touching = false, dirty = false, tipN = 0, lastHtml = { sum: '', tabs: '', list: '' };
-const TIPS = ['All quiet. New shipments pop up here live.', 'Tools are home. CT is standing by.', 'Pull a coffee. The line is calm.', 'When something lands, you will see it right here.'];
+const TIPS = ['All clear. New shipments show up here live.', 'Tools are home. CT is standing by.', 'Grab a coffee. We are all clear.', 'When something lands, you will see it right here.'];
 function card(r) {
   const j = r.j, out = isOut(j), m = r.t == null ? null : (r.t - Date.now()) / 60000, busy = pending.has(j.id) ? ' disabled' : '';
   const c = j.transit ? 'tr' : m == null ? '' : m < 45 ? 'r' : m < 90 ? 'a' : 'g';
