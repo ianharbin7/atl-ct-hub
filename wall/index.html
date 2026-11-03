@@ -132,7 +132,7 @@ const money = n => { n = Number(n || 0); const a = Math.abs(n);
   return a >= 1e6 ? '$' + (n / 1e6).toFixed(a >= 1e7 ? 1 : 2).replace(/\.?0+$/, '') + 'M' : a >= 1e3 ? '$' + Math.round(n / 1e3).toLocaleString('en-US') + 'K' : '$' + Math.round(n); };
 const moneyFull = n => '$' + Math.round(Number(n || 0)).toLocaleString('en-US');
 const pct = n => Math.round(Number(n || 0) * 100) + '%';
-const title = s => String(s || '').toLowerCase().replace(/\b[a-z]/g, c => c.toUpperCase()).replace(/\bAos\b/, 'AOS').replace(/\bRon\b/, 'RON').replace(/\bRad\b/, 'RAD').replace(/\bAtl\b/, 'ATL');
+const title = s => String(s || '').toLowerCase().replace(/\b[a-z]/g, c => c.toUpperCase()).replace(/\bAo[gs]\b/, 'AOS').replace(/\bRon\b/, 'RON').replace(/\bRad\b/, 'RAD').replace(/\bAtl\b/, 'ATL');
 const holder = n => { n = String(n || '').replace(/^\d+\w*\s+/, '') || String(n || ''); return /^\(?blank\)?$/i.test(n) ? 'Unassigned' : n; };
 const cut = (s, n) => { s = String(s || ''); return s.length > n ? s.slice(0, n - 1) + '…' : s; };
 
@@ -218,7 +218,7 @@ function buildScreens() {
   { const [c2, k2] = chg(ct.deltaValue || 0, money, true);
     add('ct', 'Dollar value of tools still out', 'What the Central Tooling tools sitting at other stations are worth',
       hero('Dollars out at other stations', money(ct.value), c2, k2, true) + tiles([{ v: num(ct.out), l: 'Number of tools' }, { v: num(ct.avgDays), l: 'Average days out' }, { v: money(ct.critValue), l: 'Value gone 30+ days', c: 'amber' }])); }
-  add('ct', 'Why our tools are out', 'Number of tools out, for each reason (AOS = aircraft on the ground)',
+  add('ct', 'Why our tools are out', 'Number of tools out, for each reason',
     bars((ct.reasons || []).slice(0, 5).map(r => ({ n: title(r.name), v: r.out, small: money(r.value) }))));
   add('ct', 'How long our tools have been out', 'Number of tools out, by how many days they have been gone',
     bars((ct.bands || []).map(b => ({ n: title(b.name).replace(/\((.*?)\)/, (m, a) => '(' + a.replace(/-/g, '–') + ' days)'), v: b.count, c: bandCls(b.name) }))));
