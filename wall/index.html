@@ -235,12 +235,12 @@ const ageCls = n => /OVER/.test(n) ? 'r' : /91/.test(n) ? 'o' : /31/.test(n) ? '
 // ── the screens (one idea each, big enough to read from across the room) ─────
 
 // ── Station map: Atlanta in the middle, a line to every station holding our tools ──
-const STN_LL = { SEA:[47.45,-122.3], PDX:[45.59,-122.6], SFO:[37.62,-122.38], LAX:[33.94,-118.41], SAN:[32.73,-117.19], LAS:[36.08,-115.15], PHX:[33.43,-112.01], SLC:[40.79,-111.98], DEN:[39.86,-104.67], DFW:[32.9,-97.04], IAH:[29.98,-95.34], MSY:[29.99,-90.26], MSP:[44.88,-93.22], ORD:[41.98,-87.9], DTW:[42.21,-83.35], CVG:[39.05,-84.66], BNA:[36.12,-86.68], MEM:[35.04,-89.98], CLT:[35.21,-80.94], CHS:[32.9,-80.04], RDU:[35.88,-78.79], IAD:[38.95,-77.46], DCA:[38.85,-77.04], PHL:[39.87,-75.24], JFK:[40.64,-73.78], LGA:[40.78,-73.87], EWR:[40.69,-74.17], BOS:[42.36,-71.0], MCO:[28.43,-81.31], TPA:[27.98,-82.53], FLL:[26.07,-80.15], MIA:[25.8,-80.29], JAX:[30.49,-81.69], SAV:[32.13,-81.2], BHM:[33.56,-86.75], MKE:[42.95,-87.9], CLE:[41.41,-81.85], PIT:[40.49,-80.23], BUF:[42.94,-78.73], SLC_:[0,0] };
+const STN_LL = { SEA:[47.45,-122.3], PDX:[45.59,-122.6], SFO:[37.62,-122.38], LAX:[33.94,-118.41], SAN:[32.73,-117.19], LAS:[36.08,-115.15], PHX:[33.43,-112.01], SLC:[40.79,-111.98], DEN:[39.86,-104.67], DFW:[32.9,-97.04], IAH:[29.98,-95.34], MSY:[29.99,-90.26], MSP:[44.88,-93.22], ORD:[41.98,-87.9], DTW:[42.21,-83.35], CVG:[39.05,-84.66], BNA:[36.12,-86.68], MEM:[35.04,-89.98], CLT:[35.21,-80.94], CHS:[32.9,-80.04], RDU:[35.88,-78.79], IAD:[38.95,-77.46], DCA:[38.85,-77.04], PHL:[39.87,-75.24], JFK:[40.64,-73.78], LGA:[40.78,-73.87], EWR:[40.69,-74.17], BOS:[42.36,-71.0], MCO:[28.43,-81.31], TPA:[27.98,-82.53], FLL:[26.07,-80.15], MIA:[25.8,-80.29], JAX:[30.49,-81.69], SAV:[32.13,-81.2], BHM:[33.56,-86.75], MKE:[42.95,-87.9], CLE:[41.41,-81.85], PIT:[40.49,-80.23], BUF:[42.94,-78.73], AUS:[30.2,-97.67], TUL:[36.2,-95.89], TLH:[30.4,-84.35], VPS:[30.48,-86.53], MLB:[28.1,-80.65], GSP:[34.9,-82.22], SAT:[29.53,-98.47], OKC:[35.39,-97.6], STL:[38.75,-90.37], MCI:[39.3,-94.71], IND:[39.72,-86.29], CMH:[40.0,-82.89], SDF:[38.17,-85.74], BWI:[39.18,-76.67], PBI:[26.68,-80.1], RSW:[26.54,-81.76], PNS:[30.47,-87.19], MOB:[30.69,-88.24], XNA:[36.28,-94.31], SMF:[38.7,-121.59], SJC:[37.36,-121.93], OAK:[37.72,-122.22], ONT:[34.06,-117.6], SNA:[33.68,-117.87], BUR:[34.2,-118.36], ABQ:[35.04,-106.61], ELP:[31.81,-106.38], HOU:[29.65,-95.28], DAL:[32.85,-96.85], OMA:[41.3,-95.89], RIC:[37.51,-77.32], ORF:[36.89,-76.2], ALB:[42.75,-73.8], BDL:[41.94,-72.68], PVD:[41.72,-71.43], MHT:[42.93,-71.44], PWM:[43.65,-70.31], SYR:[43.11,-76.1], ROC:[43.12,-77.67], HSV:[34.64,-86.78], MSN:[43.14,-89.34], GRR:[42.88,-85.52], DEN_:[0,0] };
 const US_OUT = [[-124.7,48.4],[-123.2,48.2],[-122.8,49],[-95.2,49],[-94.6,48.7],[-92,48.3],[-89.5,48],[-84.8,46.9],[-83.5,46],[-82.5,45.3],[-82.4,43],[-83.1,42.1],[-82.5,41.7],[-79,42.8],[-76.5,43.6],[-75,45],[-71.5,45],[-70.2,46.5],[-69.2,47.4],[-67.8,47.1],[-67,44.8],[-70.2,43.6],[-70.7,42.6],[-70,41.8],[-71.5,41.3],[-74,40.6],[-74,39.5],[-75.5,38.4],[-76,37],[-75.6,35.2],[-77,34.6],[-79,33.6],[-81,31.8],[-81.4,30.2],[-80.2,27],[-80.1,25.5],[-81.1,25.1],[-82.7,27.5],[-82.8,29.2],[-84,30],[-86,30.3],[-88,30.3],[-89.5,30.2],[-89.2,29.1],[-91,29.2],[-93.8,29.7],[-97,27.8],[-97.2,25.9],[-99.1,26.4],[-100.5,28.5],[-101.4,29.8],[-103,29],[-104.5,29.7],[-106.5,31.8],[-108.2,31.8],[-111,31.3],[-114.8,32.5],[-117.1,32.5],[-118.5,34],[-120.6,34.5],[-122,36.9],[-123.8,39.5],[-124.4,40.4],[-124.1,43],[-124.1,46.2]];
 let SM_LIST = [];
 function stationMap(list) {
   SM_LIST = list;
-  const off = list.filter(s => !STN_LL[String(s.name).toUpperCase()]);
+  const off = list.filter(s => !STN_LL[String(s.name).toUpperCase()]).sort((a, b) => b.tools - a.tools);
   const leg = `<div class="smleg"><span><i style="background:var(--red)"></i>$250K or more</span><span><i style="background:var(--amber)"></i>$100K to $250K</span><span><i style="background:var(--blue)"></i>Under $100K</span><span>Thicker line = more tools</span>${off.length ? `<span class="smoff">Also: ${off.map(s => esc(s.name) + ' (' + num(s.tools) + ')').join(', ')}</span>` : ''}</div>`;
   return `<div class="smap"><svg></svg>${leg}</div>`;
 }
@@ -253,7 +253,7 @@ function drawMap(svg, W, H) {
   if (sx > sy * 1.8) sx = sy * 1.8; if (sy > sx * 2.4) sy = sx * 2.4;
   const ox = (W - wu * sx) / 2, oy = (H - hu * sy) / 2;
   const P = (la, lo) => [ox + (lo - LON0) * .79 * sx, oy + (LAT0 - la) * 1.12 * sy];
-  const A = P(33.64, -84.43), col = v => v >= 250000 ? 'var(--red)' : v >= 100000 ? 'var(--amber)' : 'var(--blue)';
+  const A = P(33.64, -84.43), col = (v, d) => v >= 250000 ? 'var(--red)' : v >= 100000 ? 'var(--amber)' : 'var(--blue)';
   const pts = list.map(s => { const q = STN_LL[String(s.name).toUpperCase()], t = P(q[0], q[1]); return { s, t, x: t[0], y: t[1], lo: q[1] }; });
   // The crowded Northeast (JFK, LGA, EWR, BOS...) is lined up in a column out over the ocean, each with a thin leader to its real spot
   const ne = pts.filter(q => q.lo > -82.5 && STN_LL[String(q.s.name).toUpperCase()][0] > 36.5).sort((u, v) => v.t[1] * -1 - u.t[1] * -1);
@@ -262,16 +262,25 @@ function drawMap(svg, W, H) {
     let y0 = mean - step * (ne.length - 1) / 2; y0 = Math.max(my0, Math.min(H - my0 - step * (ne.length - 1), y0));
     ne.forEach((q, i) => { q.x = cx; q.y = y0 + i * step; q.fixed = true; });
   }
-  const free = pts.filter(q => !q.fixed), gap = r * 2 + f * 2.6;
-  for (let it = 0; it < 80; it++) for (let i = 0; i < free.length; i++) for (let j = i + 1; j < free.length; j++) {
-    let dx = free[j].x - free[i].x, dy = free[j].y - free[i].y, d = Math.hypot(dx, dy);
-    if (d < gap) { if (d < .01) { dx = 1; dy = (j - i) * .5; d = Math.hypot(dx, dy); } const k = (gap - d) / 2 / d; free[i].x -= dx * k; free[i].y -= dy * k; free[j].x += dx * k; free[j].y += dy * k; }
+  // Stations near Atlanta are moved out along their own line so their badges do not pile up on it, then any badges that still touch are nudged apart.
+  const free = pts.filter(q => !q.fixed), R0 = f * 5.2, bw = f * 5.6, bh = f * 1.9;
+  free.forEach((q, i) => { let dx = q.x - A[0], dy = q.y - A[1], d = Math.hypot(dx, dy); if (d < .5) { dx = Math.cos(i * 2.4); dy = Math.sin(i * 2.4); d = 1; } if (d < R0) { q.x = A[0] + dx / d * R0; q.y = A[1] + dy / d * R0; } });
+  const hub = { x: A[0] - f * 1.5, y: A[1] + f * 1.2, fixed: true }, all = pts.concat([hub]);
+  for (let it = 0; it < 200; it++) { for (let i = 0; i < all.length; i++) for (let j = i + 1; j < all.length; j++) {
+    const a = all[i], c = all[j]; if (a.fixed && c.fixed) continue;
+    const dx = c.x - a.x, dy = c.y - a.y, ox = bw - Math.abs(dx), oy = bh - Math.abs(dy);
+    if (ox > 0 && oy > 0) {
+      const mvA = a.fixed ? 0 : (c.fixed ? 1 : .5), mvC = 1 - mvA;
+      if (oy <= ox) { const sg = dy === 0 ? (i % 2 ? 1 : -1) : Math.sign(dy); a.y -= sg * oy * mvA; c.y += sg * oy * mvC; }
+      else { const sg = dx === 0 ? 1 : Math.sign(dx); a.x -= sg * ox * mvA; c.x += sg * ox * mvC; }
+    }
   }
+  pts.forEach(q => { if (!q.fixed) { q.x = Math.max(mx0 * .5, Math.min(W - mx0 * .5, q.x)); q.y = Math.max(my0, Math.min(H - my0, q.y)); } }); }
   pts.forEach(q => { q.x = Math.max(mx0 * .5, Math.min(W - mx0 * .5, q.x)); q.y = Math.max(my0, Math.min(H - my0, q.y)); });
   let g = `<path d="M${US_OUT.map(([lo, la]) => P(la, lo).join(',')).join('L')}Z" fill="#0f2542" stroke="#2b4b78" stroke-width="1.5" stroke-linejoin="round"/>`;
   let lines = '', st = '', pins = '';
   pts.forEach((q, i) => {
-    const n = +q.s.tools || 0, c = col(+q.s.value || 0), name = String(q.s.name).toUpperCase();
+    const n = +q.s.tools || 0, c = col(+q.s.value || 0, +q.s.oldest || 0), name = String(q.s.name).toUpperCase();
     const ex = q.t[0], ey = q.t[1], mx = (A[0] + ex) / 2, my = (A[1] + ey) / 2 - Math.hypot(ex - A[0], ey - A[1]) * .14;
     lines += `<path id="sm${i}" d="M${A[0]},${A[1]} Q${mx},${my} ${ex},${ey}" fill="none" stroke="${c}" stroke-width="${(f * .2 + Math.min(n, 20) * f * .07).toFixed(1)}" stroke-linecap="round" opacity=".78"/>`;
     if (i % 2 === 0) lines += `<circle r="${(f * .2).toFixed(1)}" fill="#fff"><animateMotion dur="${8 + i * 1.5}s" repeatCount="indefinite"><mpath href="#sm${i}"/></animateMotion></circle>`;
@@ -314,7 +323,7 @@ function buildScreens() {
     bars((ct.bands || []).map(b => ({ n: title(b.name).replace(/\((.*?)\)/, (m, a) => '(' + a.replace(/-/g, '–') + ' days)'), v: b.count, c: bandCls(b.name) }))));
   add('ct', 'Stations holding the most of our money', 'Dollar value of our tools sitting at each station',
     bars((ct.stations || []).slice().sort((a, b) => b.value - a.value).slice(0, 5).map(s => ({ n: s.name, v: s.value, label: money(s.value), small: num(s.tools) + (s.tools === 1 ? ' tool' : ' tools') }))));
-  if ((ct.stations || []).some(s => STN_LL[String(s.name).toUpperCase()])) add('ct', 'Where our tools are', 'Each line is a station holding Central Tooling tools. Thicker line means more tools.', stationMap(ct.stations || []));
+  if ((ct.chase || ct.stations || []).some(s => STN_LL[String(s.name).toUpperCase()])) add('ct', 'Where our tools are', 'Each line is a station holding Central Tooling tools. Thicker line means more tools.', stationMap(ct.chase || ct.stations || []));
   add('ct', 'The tools that have been out longest', 'Tool number and how many days it has been gone',
     rowsList((ct.oldest || []).slice(0, 5).map(o => ({ a: o.id, b: String(o.days).toLowerCase(), c: 'red' }))));
   add('ct', 'The most valuable tools still out', 'Tool number and how long it has been out',
