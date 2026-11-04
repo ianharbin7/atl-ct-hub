@@ -323,6 +323,8 @@ function buildScreens() {
     `<div class="note">${num(f.out)} on ${f.d ? f.d.slice(5).replace('-', '/') : 'day one'} → <b style="color:#fff">${num(ct.out)}</b> today</div><div class="chartbox">${chart(tr, 'out', '#38bdf8', v => num(Math.round(v)))}</div>`);
   add('ct', 'Is less money out than before?', 'Dollar value of Central Tooling tools out, over time',
     `<div class="note">${money(f.value)} → <b style="color:#fff">${money(ct.value)}</b> today</div><div class="chartbox">${chart(tr, 'value', '#f87171', money)}</div>`);
+  if (tr.length > 2 && tr.some(t => t.crit != null)) add('ct', 'Tools gone 30+ days, over time', 'Number of Central Tooling tools that have been out 30 days or more',
+    `<div class="note">${num(f.crit)} on ${f.d ? f.d.slice(5).replace('-', '/') : 'day one'} → <b style="color:#fff">${num(ct.crit)}</b> today</div><div class="chartbox">${chart(tr, 'crit', '#f59e0b', v => num(Math.round(v)))}</div>`);
   add('ct', 'Share of our tools that came back', 'Of all the tools we sent out, how many have been returned',
     `<div class="gauge">${gauge(ct.recoveryRate)}<div class="gtxt"><div class="note">of tools sent out have come back</div></div></div>` + tiles([{ v: num(ct.recovered), l: 'Tools returned' }, { v: money(ct.recoveredValue), l: 'Dollars recovered', c: 'green' }]) + `<div class="chartbox" style="flex:1;min-height:0">${chart(tr, 'rate', '#22c55e', v => Math.round(v * 100) + '%', [0, 1], [800, 420])}</div>`);
   add('ct', 'How far we have come', 'Change since we started tracking on ' + (f.d ? f.d.slice(5).replace('-', '/') : 'day one'),
@@ -345,6 +347,13 @@ function buildScreens() {
       bars(m.plane.map(r => ({ n: shiftName(r.name), v: r.total, small: pct(r.share) }))));
     add('mv', 'Dollar value we shipped, by shift', 'Dollar value of tools sent out of ATL by each shift ' + mn,
       bars(m.all.map(r => ({ n: shiftName(r.name), v: r.atlValue, label: money(r.atlValue), small: num(r.atl) + ' sent' }))));
+    if ((m.byMonth || []).length > 1) {
+      const ad = new Date(D.asOf), cur = ['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'][ad.getMonth()] + ' ' + ad.getFullYear();
+      add('mv', 'Shipments, month by month', 'Number of shipments handled each month. The newest month is still adding up.',
+        bars(m.byMonth.map(r => ({ n: title(r.m), v: r.total, small: String(r.m).toUpperCase() === cur ? 'so far' : '' }))));
+    }
+    if ((m.byDow || []).length) add('mv', 'Shipments by day of the week', 'Shipments handled on each day of the week since we started counting',
+      bars(m.byDow.map(r => ({ n: title(r.d), v: r.total, small: num(r.atl) + ' from ATL' + (r.out ? ' + ' + num(r.out) + ' between stations' : '') }))));
     add('mv', 'Busy times and top reasons', 'What the shipment record shows since we started counting',
       tiles([{ v: esc(title(m.busiestDay)), l: 'Busiest day of the week', s: m.busiestDayNote }, { v: esc(m.topReason), l: 'Most common reason', s: m.topReasonNote }]) + tiles([{ v: pct(m.planeShare), l: 'Of shipments are for planes that are down', s: m.planeNote, c: 'red' }, { v: pct(m.weekend), l: 'Of shipments happen on weekends' }]));
   }
