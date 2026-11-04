@@ -272,10 +272,10 @@ function drawMap(svg, W, H) {
   let lines = '', st = '', pins = '';
   pts.forEach((q, i) => {
     const n = +q.s.tools || 0, c = col(+q.s.value || 0), name = String(q.s.name).toUpperCase();
-    const mx = (A[0] + q.x) / 2, my = (A[1] + q.y) / 2 - Math.hypot(q.x - A[0], q.y - A[1]) * .14;
-    lines += `<path id="sm${i}" d="M${A[0]},${A[1]} Q${mx},${my} ${q.x},${q.y}" fill="none" stroke="${c}" stroke-width="${(f * .2 + Math.min(n, 20) * f * .07).toFixed(1)}" stroke-linecap="round" opacity=".78"/>`;
+    const ex = q.t[0], ey = q.t[1], mx = (A[0] + ex) / 2, my = (A[1] + ey) / 2 - Math.hypot(ex - A[0], ey - A[1]) * .14;
+    lines += `<path id="sm${i}" d="M${A[0]},${A[1]} Q${mx},${my} ${ex},${ey}" fill="none" stroke="${c}" stroke-width="${(f * .2 + Math.min(n, 20) * f * .07).toFixed(1)}" stroke-linecap="round" opacity=".78"/>`;
     if (i % 2 === 0) lines += `<circle r="${(f * .2).toFixed(1)}" fill="#fff"><animateMotion dur="${8 + i * 1.5}s" repeatCount="indefinite"><mpath href="#sm${i}"/></animateMotion></circle>`;
-    if (Math.hypot(q.x - q.t[0], q.y - q.t[1]) > 4) pins += `<line x1="${q.t[0]}" y1="${q.t[1]}" x2="${q.x}" y2="${q.y}" stroke="#7f99bb" stroke-width="1"/><circle cx="${q.t[0]}" cy="${q.t[1]}" r="2.5" fill="#cfe0f5"/>`;
+    if (Math.hypot(q.x - q.t[0], q.y - q.t[1]) > 4) pins += `<line x1="${q.t[0]}" y1="${q.t[1]}" x2="${q.x}" y2="${q.y}" stroke="#9fb8d6" stroke-width="1.5" stroke-dasharray="2 4"/><circle cx="${q.t[0]}" cy="${q.t[1]}" r="${(f * .3).toFixed(1)}" fill="${c}" stroke="#050e1a" stroke-width="2"/>`;
     const east = q.lo > -100 || q.x > A[0];
     st += `<circle cx="${q.x}" cy="${q.y}" r="${r}" fill="${c}" stroke="#050e1a" stroke-width="2"/><text x="${q.x}" y="${q.y + f * .32}" text-anchor="middle" font-size="${(f * .85).toFixed(1)}" font-weight="800" fill="#050e1a">${n}</text><text x="${q.x + (east ? r + 6 : -r - 6)}" y="${q.y + f * .36}" text-anchor="${east ? 'start' : 'end'}" font-size="${f}" font-weight="800" fill="#eef5fc" letter-spacing="1">${esc(name)}</text>`;
   });
