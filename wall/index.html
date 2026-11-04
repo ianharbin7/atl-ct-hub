@@ -35,6 +35,14 @@
   .tag { padding: .5cqh 1.96cqh; border-radius: 999px; font-size: 2.2cqh; font-weight: 800; letter-spacing: .14em; color: #fff; background: var(--c); }
   .ttl { font-size: 4.6cqh; font-weight: 800; letter-spacing: .02em; line-height: 1.1; }
     .stale { color: var(--amber); font-weight: 700; }
+  .smap { flex: 1; min-height: 0; display: flex; flex-direction: column; gap: 1cqh; }
+  .smap svg { flex: 1; min-height: 0; width: 100%; }
+  .smap svg text { font-family: inherit; }
+  .smring { fill: none; stroke: #fff; stroke-width: 1.5; animation: smp 3s ease-out infinite; }
+  @keyframes smp { 0% { r: 6; opacity: .7; } 100% { r: 28; opacity: 0; } }
+  .smleg { display: flex; flex-wrap: wrap; gap: .4cqh 2cqw; color: var(--mut); font-size: max(1.1vw, 2.6cqh); }
+  .smleg i { display: inline-block; width: 1.6cqw; height: .5cqh; border-radius: 4px; margin-right: .5cqw; vertical-align: middle; }
+  .smoff { color: var(--ink); }
   .body { flex: 1; min-height: 0; display: flex; flex-direction: column; gap: 2.6cqh; justify-content: space-evenly; }
   .foot { flex: none; margin-top: 1.2cqh; font-size: 1.9cqh; color: var(--mut); text-align: right; }
 
@@ -220,6 +228,29 @@ const bandCls = n => /MONITOR/.test(n) ? 'g' : /CONTACT/.test(n) ? 'y' : /FOLLOW
 const ageCls = n => /OVER/.test(n) ? 'r' : /91/.test(n) ? 'o' : /31/.test(n) ? 'y' : /CLOCK/.test(n) ? '' : 'g';
 
 // ── the screens (one idea each, big enough to read from across the room) ─────
+
+// ── Station map: Atlanta in the middle, a line to every station holding our tools ──
+const STN_LL = { SEA:[47.45,-122.3], PDX:[45.59,-122.6], SFO:[37.62,-122.38], LAX:[33.94,-118.41], SAN:[32.73,-117.19], LAS:[36.08,-115.15], PHX:[33.43,-112.01], SLC:[40.79,-111.98], DEN:[39.86,-104.67], DFW:[32.9,-97.04], IAH:[29.98,-95.34], MSY:[29.99,-90.26], MSP:[44.88,-93.22], ORD:[41.98,-87.9], DTW:[42.21,-83.35], CVG:[39.05,-84.66], BNA:[36.12,-86.68], MEM:[35.04,-89.98], CLT:[35.21,-80.94], CHS:[32.9,-80.04], RDU:[35.88,-78.79], IAD:[38.95,-77.46], DCA:[38.85,-77.04], PHL:[39.87,-75.24], JFK:[40.64,-73.78], LGA:[40.78,-73.87], EWR:[40.69,-74.17], BOS:[42.36,-71.0], MCO:[28.43,-81.31], TPA:[27.98,-82.53], FLL:[26.07,-80.15], MIA:[25.8,-80.29], JAX:[30.49,-81.69], SAV:[32.13,-81.2], BHM:[33.56,-86.75], MKE:[42.95,-87.9], CLE:[41.41,-81.85], PIT:[40.49,-80.23], BUF:[42.94,-78.73], SLC_:[0,0] };
+const US_OUT = [[-124.7,48.4],[-123.2,48.2],[-122.8,49],[-95.2,49],[-94.6,48.7],[-92,48.3],[-89.5,48],[-84.8,46.9],[-83.5,46],[-82.5,45.3],[-82.4,43],[-83.1,42.1],[-82.5,41.7],[-79,42.8],[-76.5,43.6],[-75,45],[-71.5,45],[-70.2,46.5],[-69.2,47.4],[-67.8,47.1],[-67,44.8],[-70.2,43.6],[-70.7,42.6],[-70,41.8],[-71.5,41.3],[-74,40.6],[-74,39.5],[-75.5,38.4],[-76,37],[-75.6,35.2],[-77,34.6],[-79,33.6],[-81,31.8],[-81.4,30.2],[-80.2,27],[-80.1,25.5],[-81.1,25.1],[-82.7,27.5],[-82.8,29.2],[-84,30],[-86,30.3],[-88,30.3],[-89.5,30.2],[-89.2,29.1],[-91,29.2],[-93.8,29.7],[-97,27.8],[-97.2,25.9],[-99.1,26.4],[-100.5,28.5],[-101.4,29.8],[-103,29],[-104.5,29.7],[-106.5,31.8],[-108.2,31.8],[-111,31.3],[-114.8,32.5],[-117.1,32.5],[-118.5,34],[-120.6,34.5],[-122,36.9],[-123.8,39.5],[-124.4,40.4],[-124.1,43],[-124.1,46.2]];
+function stationMap(list) {
+  const K = 19.2, X0 = 30, Y0 = 18, P = (la, lo) => [X0 + (lo + 125) * 0.79 * K, Y0 + (50 - la) * K * 1.12];
+  const A = P(33.64, -84.43), on = [], off = [];
+  list.forEach(s => (STN_LL[String(s.name).toUpperCase()] ? on : off).push(s));
+  const col = v => v >= 250000 ? 'var(--red)' : v >= 100000 ? 'var(--amber)' : 'var(--blue)';
+  let g = `<path d="M${US_OUT.map(([lo, la]) => P(la, lo).join(',')).join('L')}Z" fill="#0f2542" stroke="#2b4b78" stroke-width="1.5" stroke-linejoin="round"/>`;
+  let st = '', lines = '';
+  on.forEach((s, i) => {
+    const [la, lo] = STN_LL[String(s.name).toUpperCase()], p = P(la, lo), n = +s.tools || 0, c = col(+s.value || 0);
+    const mx = (A[0] + p[0]) / 2, my = (A[1] + p[1]) / 2 - Math.hypot(p[0] - A[0], p[1] - A[1]) * .14;
+    lines += `<path id="sm${i}" d="M${A[0]},${A[1]} Q${mx},${my} ${p[0]},${p[1]}" fill="none" stroke="${c}" stroke-width="${(2 + n * 1.1).toFixed(1)}" stroke-linecap="round" opacity=".78"/>`;
+    if (i % 2 === 0) lines += `<circle r="3.4" fill="#fff"><animateMotion dur="${8 + i * 1.5}s" repeatCount="indefinite"><mpath href="#sm${i}"/></animateMotion></circle>`;
+    const east = lo > -100, tx = p[0] + (east ? 20 : -20), ta = east ? 'start' : 'end';
+    st += `<circle cx="${p[0]}" cy="${p[1]}" r="15" fill="${c}" stroke="#050e1a" stroke-width="2"/><text x="${p[0]}" y="${p[1] + 6}" text-anchor="middle" font-size="18" font-weight="800" fill="#050e1a">${n}</text><text x="${tx}" y="${p[1] + 8}" text-anchor="${ta}" font-size="24" font-weight="800" fill="#eef5fc" letter-spacing="1">${esc(s.name)}</text>`;
+  });
+  g += lines + st + `<circle class="smring" cx="${A[0]}" cy="${A[1]}" r="6"/><circle cx="${A[0]}" cy="${A[1]}" r="11" fill="#fff" stroke="#38bdf8" stroke-width="3"/><text x="${A[0] - 14}" y="${A[1] + 26}" text-anchor="end" font-size="26" font-weight="800" fill="#eef5fc">ATL</text>`;
+  const leg = `<div class="smleg"><span><i style="background:var(--red)"></i>$250K or more</span><span><i style="background:var(--amber)"></i>$100K to $250K</span><span><i style="background:var(--blue)"></i>Under $100K</span><span>Thicker line = more tools</span>${off.length ? `<span class="smoff">Also: ${off.map(s => esc(s.name) + ' (' + num(s.tools) + ')').join(', ')}</span>` : ''}</div>`;
+  return `<div class="smap"><svg viewBox="0 0 1000 540" preserveAspectRatio="xMidYMid meet">${g}</svg>${leg}</div>`;
+}
 function buildScreens() {
   CHARTS.length = 0;
   const ct = D.ct || {}, atl = D.atl || {}, all = D.all || {}, tr = D.trend || [], f = tr[0] || {}, X = D.x || {};
@@ -246,6 +277,7 @@ function buildScreens() {
     bars((ct.bands || []).map(b => ({ n: title(b.name).replace(/\((.*?)\)/, (m, a) => '(' + a.replace(/-/g, '–') + ' days)'), v: b.count, c: bandCls(b.name) }))));
   add('ct', 'Stations holding the most of our money', 'Dollar value of our tools sitting at each station',
     bars((ct.stations || []).slice().sort((a, b) => b.value - a.value).slice(0, 5).map(s => ({ n: s.name, v: s.value, label: money(s.value), small: num(s.tools) + (s.tools === 1 ? ' tool' : ' tools') }))));
+  if ((ct.stations || []).some(s => STN_LL[String(s.name).toUpperCase()])) add('ct', 'Where our tools are', 'Each line is a station holding Central Tooling tools. Thicker line means more tools.', stationMap(ct.stations || []));
   add('ct', 'The tools that have been out longest', 'Tool number and how many days it has been gone',
     rowsList((ct.oldest || []).slice(0, 5).map(o => ({ a: o.id, b: String(o.days).toLowerCase(), c: 'red' }))));
   add('ct', 'The most valuable tools still out', 'Tool number and how long it has been out',
@@ -456,7 +488,15 @@ $('#bf').src = BOARD + '/?tv&bare';
 addEventListener('resize', applyLayout);
 
 async function loadData() {
-  try { const r = await fetch(BOARD + '/api/dashboard', { cache: 'no-store' }); if (r.ok) { const d = await r.json(); if (d && d.ct) { try { localStorage.setItem('ctwall-data', JSON.stringify(d)); } catch (e) {} return d; } } } catch (e) {}
+  // The board can lose its copy of the numbers when it restarts. If this screen remembers newer numbers than the board has, use them and hand them back to the board.
+  let cached = null; try { cached = JSON.parse(localStorage.getItem('ctwall-data') || 'null'); } catch (e) {}
+  const ts = d => { const t = Date.parse(d && d.asOf); return isNaN(t) ? 0 : t; };
+  try { const r = await fetch(BOARD + '/api/dashboard', { cache: 'no-store' }); if (r.ok) { const d = await r.json(); if (d && d.ct) {
+    if (cached && cached.ct && cached.atl && cached.all && ts(cached) > ts(d)) {
+      try { fetch(BOARD + '/api/dashboard', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(cached) }); } catch (e) {}
+      return cached;
+    }
+    try { localStorage.setItem('ctwall-data', JSON.stringify(d)); } catch (e) {} return d; } } } catch (e) {}
   try { const c = JSON.parse(localStorage.getItem('ctwall-data') || 'null'); if (c && c.ct) return c; } catch (e) {}
   try { const r = await fetch('seed.json', { cache: 'no-store' }); return await r.json(); } catch (e) { return null; }
 }
