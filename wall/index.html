@@ -205,7 +205,8 @@ setInterval(fitCharts, 1500);
 function chartSvg(ci, W, H) {
   const [points, key, color, fmt, fixed] = CHARTS[ci];
   const pad = { l: 172, r: 16, t: 34, b: 60 };
-  const vals = points.map(p => p[key]);
+  const est = points.length > 2 && points[points.length - 1].est != null;
+  const vals = points.map(p => p.est != null ? p.est : p[key]);
   let lo, hi;
   if (fixed) { lo = fixed[0]; hi = fixed[1]; }
   else { lo = 0; hi = Math.max(...vals); const st = Math.pow(10, Math.floor(Math.log10(hi || 1))); hi = Math.ceil(hi / (st / 2)) * (st / 2); }
@@ -213,13 +214,17 @@ function chartSvg(ci, W, H) {
   const Y = v => pad.t + (hi - v) * (H - pad.t - pad.b) / (hi - lo);
   let g = '';
   for (let i = 0; i <= 4; i++) { const v = lo + (hi - lo) * i / 4, y = Y(v); g += `<line x1="${pad.l}" x2="${W - pad.r}" y1="${y}" y2="${y}" stroke="#1a3452"/><text x="${pad.l - 16}" y="${y + 11}" text-anchor="end" font-size="40" fill="#9bb7d4">${fmt(v)}</text>`; }
-  const path = points.map((p, i) => (i ? 'L' : 'M') + X(i).toFixed(1) + ',' + Y(p[key]).toFixed(1)).join(' ');
+  const yv = (p, i) => Y(vals[i]).toFixed(1);
+  const nSolid = est ? points.length - 1 : points.length;
+  const path = points.slice(0, nSolid).map((p, i) => (i ? 'L' : 'M') + X(i).toFixed(1) + ',' + yv(p, i)).join(' ');
+  const dash = est ? `<path d="M${X(nSolid - 1).toFixed(1)},${yv(0, nSolid - 1)} L${X(nSolid).toFixed(1)},${yv(0, nSolid)}" fill="none" stroke="${color}" stroke-width="7" stroke-dasharray="3 18" stroke-linecap="round" opacity=".9"/>` : '';
   const md = d => { const p = d.split('-'); return p.length < 3 || d.length <= 7 ? ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][+p[1] - 1] : +p[1] + '/' + +p[2]; };
   const last = points.length - 1, mid = Math.floor(last / 2);
   return `<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="xMidYMid meet">${g}
-    <path d="${path} L${X(last)},${H - pad.b} L${X(0)},${H - pad.b} Z" class="ar" fill="${color}" opacity=".16"/>
+    <path d="${path} L${X(nSolid - 1)},${H - pad.b} L${X(0)},${H - pad.b} Z" class="ar" fill="${color}" opacity=".16"/>
     <path class="ln" pathLength="1" d="${path}" fill="none" stroke="${color}" stroke-width="8" stroke-linejoin="round" stroke-linecap="round"/>
-    <circle cx="${X(last)}" cy="${Y(vals[last])}" r="13" fill="${color}" stroke="#0b1a2c" stroke-width="4"/>
+    ${dash}${est ? `<circle cx="${X(nSolid - 1)}" cy="${Y(vals[nSolid - 1])}" r="11" fill="${color}" stroke="#0b1a2c" stroke-width="4"/>` : ''}
+    <circle cx="${X(last)}" cy="${Y(vals[last])}" r="13" fill="${est ? '#0b1a2c' : color}" stroke="${color}" stroke-width="${est ? 6 : 4}"/>
     <text x="${X(0)}" y="${H - 12}" font-size="36" fill="#9bb7d4" text-anchor="start">${md(points[0].d)}</text>
     <text x="${X(mid)}" y="${H - 12}" font-size="36" fill="#9bb7d4" text-anchor="middle">${md(points[mid].d)}</text>
     <text x="${X(last)}" y="${H - 12}" font-size="36" fill="#9bb7d4" text-anchor="end">${md(points[last].d)}</text></svg>`;
@@ -388,8 +393,15 @@ function buildScreens() {
   }
   if ((A.monthly || []).length > 2) {
     const mp = A.monthly.map(r => ({ d: r.m, out: r.out })), lastM = A.monthly[A.monthly.length - 1], prevM = A.monthly[A.monthly.length - 2];
+    // The newest month is only partly done, so it would drop to the floor. Show it as a dashed "on pace" point instead, with the real count in the note.
+    const ad = new Date(D.asOf), mm = String(ad.getFullYear()) + '-' + String(ad.getMonth() + 1).padStart(2, '0'), dim = new Date(ad.getFullYear(), ad.getMonth() + 1, 0).getDate(), frac = ad.getDate() / dim;
+    let pace = '';
+    if (lastM && String(lastM.m).slice(0, 7) === mm) {
+      if (frac >= .12) { const e = Math.round(lastM.out / frac); mp[mp.length - 1].est = e; pace = `<div class="note">${monName(lastM.m)} so far: <b style="color:#fff">${num(lastM.out)}</b> checkouts, on pace for about <b style="color:#fff">${num(e)}</b></div>`; }
+      else { mp.pop(); pace = `<div class="note">${monName(lastM.m)} just started: <b style="color:#fff">${num(lastM.out)}</b> checkouts so far</div>`; }
+    }
     add('act', 'Tool room traffic, month by month', 'Number of tool checkouts each month' + (lastM ? ' (' + monName(lastM.m) + ' is still in progress)' : ''),
-      `<div class="note">${monName(prevM.m)}: <b style="color:#fff">${num(prevM.out)}</b> checkouts</div><div class="chartbox">${chart(mp, 'out', '#a78bfa', v => num(Math.round(v)))}</div>`);
+      `<div class="note">${monName(pace ? prevM.m : lastM.m)}: <b style="color:#fff">${num(pace ? prevM.out : lastM.out)}</b> checkouts</div>${pace}<div class="chartbox">${chart(mp, 'out', '#a78bfa', v => num(Math.round(v)))}</div>`);
   }
   if (A.rooms && (A.rooms.rows || []).length) add('act', 'Busiest tool rooms', 'Tool checkouts so far in ' + monName(A.rooms.month) + ', by tool room',
     bars(A.rooms.rows.slice().sort((a, b) => b.out - a.out).slice(0, 6).map(r => ({ n: room(r.room), v: r.out, small: r.station }))));
