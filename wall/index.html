@@ -56,16 +56,16 @@
   .tiles { flex: 1 1 0; min-height: 0; display: grid; grid-template-columns: repeat(var(--n, 3), 1fr); grid-auto-rows: minmax(0, 1fr); gap: 1.78cqh; }
   .body:has(.rows) > .tiles, .body:has(.bars) > .tiles, .body:has(.gauge) > .tiles, .body:has(.chartbox) > .tiles, .body:has(.says) > .tiles { flex: none; height: 20cqh; }
   .tile { container-type: size; display: flex; flex-direction: column; justify-content: center; overflow: hidden; background: #0f2238; border: 1px solid var(--line); border-radius: 1.78cqh; padding: 0 1.78cqh; min-width: 0; }
-  .tile .v { white-space: nowrap; font-size: min(46cqh, 19cqw); font-weight: 800; line-height: 1.02; font-variant-numeric: tabular-nums; }
+  .tile .v { white-space: nowrap; font-size: min(52cqh, 19cqw); font-weight: 800; line-height: var(--vlh, .92); font-variant-numeric: tabular-nums; }
   .tile .l { margin-top: 3cqh; font-size: min(13cqh, 6.4cqw); font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--mut); line-height: 1.15; }
   .tile .s { margin-top: 2cqh; font-size: min(11cqh, 6cqw); color: #b5cbe2; line-height: 1.15; }
   /* in narrow panels the number sits to the left of its label, as big as the box allows (the query only sees .tile, so the rest is passed down through variables) */
-  .tile .v { grid-column: var(--vc, auto); grid-row: var(--vr, auto); font-size: var(--vf, min(46cqh, 19cqw)); }
+  .tile .v { grid-column: var(--vc, auto); grid-row: var(--vr, auto); font-size: var(--vf, min(52cqh, 19cqw)); }
   .tile .l { grid-column: var(--lc, auto); grid-row: var(--lr, auto); margin-top: var(--lm, 3cqh); align-self: var(--la, auto); font-size: var(--lf, min(13cqh, 6.4cqw)); }
   .tile .s { grid-column: var(--lc, auto); grid-row: var(--sr, auto); margin-top: var(--sm, 2cqh); align-self: var(--sa, auto); font-size: var(--sf, min(11cqh, 6cqw)); }
   .tile .l:last-child { grid-row: var(--lr1, auto); align-self: var(--la1, auto); }
   @container (aspect-ratio < 1) { .tile { display: grid; grid-template-columns: auto minmax(0, 1fr); grid-template-rows: 1fr 1fr; align-items: center; column-gap: 4cqw; row-gap: 0;
-    --vc: 1; --vr: 1 / span 2; --vf: min(84cqh, 17cqw); --lc: 2; --lr: 1; --lm: 0; --la: end; --lf: min(21cqh, 5cqw); --sr: 2; --sm: .5cqh; --sa: start; --sf: min(18cqh, 4.4cqw); --lr1: 1 / span 2; --la1: center; } }
+    --vc: 1; --vr: 1 / span 2; --vf: min(100cqh, 17cqw); --vlh: .8; --lc: 2; --lr: 1; --lm: 0; --la: end; --lf: min(19cqh, 4.6cqw); --sr: 2; --sm: .5cqh; --sa: start; --sf: min(15cqh, 4cqw); --lr1: 1 / span 2; --la1: center; } }
   @container (aspect-ratio < 1) { .tiles { grid-template-columns: 1fr; } .body:has(.rows) > .tiles, .body:has(.bars) > .tiles, .body:has(.gauge) > .tiles, .body:has(.chartbox) > .tiles, .body:has(.says) > .tiles { height: calc(var(--n, 3) * 11cqh); } }
   .tile.red .v { color: #ff7b7b; } .tile.amber .v { color: #fbbf24; } .tile.green .v { color: #5eea96; }
 
@@ -84,6 +84,15 @@
   @keyframes barshine { to { left: 130%; } }
   .scr.on :is(.tile, .row, .bar .r1, .goal, .say, .hero, .chip) { animation: rise .7s cubic-bezier(.2,.7,.2,1) both; animation-delay: calc(var(--k, 0) * 90ms); }
   @keyframes rise { from { opacity: 0; transform: translateY(2.2cqh); } }
+  .tile { position: relative; }
+  .scr.on .tile .v { transform-origin: left center; animation: numpop 1s cubic-bezier(.2,1.5,.4,1) both; animation-delay: calc(var(--k, 0) * 90ms + 300ms); }
+  @keyframes numpop { 0% { opacity: 0; transform: scale(.6); filter: blur(.6cqh); } 60% { opacity: 1; filter: none; } 100% { transform: none; } }
+  .scr.on .tile::after { content: ''; position: absolute; top: 0; bottom: 0; width: 22%; left: -30%; pointer-events: none; background: linear-gradient(100deg, transparent, rgba(255,255,255,.13), transparent); animation: tileshine 1.2s ease-out both; animation-delay: calc(var(--k, 0) * 90ms + 900ms); }
+  @keyframes tileshine { to { left: 120%; } }
+  .scr.on .hero .v { transform-origin: left center; animation: heroin 1.1s cubic-bezier(.2,1.3,.4,1) both; }
+  @keyframes heroin { 0% { opacity: 0; transform: scale(.82); filter: blur(1cqh); } 55% { opacity: 1; filter: none; } 100% { transform: none; } }
+  .scr.on .smln { stroke-dasharray: 1; stroke-dashoffset: 0; animation: lndraw 1.7s ease-out both; animation-delay: calc(var(--d, 0) * 70ms + 200ms); }
+  .scr.on .smst { transform-box: fill-box; transform-origin: center; animation: dotpop .7s cubic-bezier(.2,1.6,.4,1) both; animation-delay: calc(var(--d, 0) * 70ms + 1200ms); }
   .scr.on .gauge svg circle[stroke="#22c55e"] { animation: gaugefill 1.6s cubic-bezier(.2,.7,.2,1) .2s both; }
   @keyframes gaugefill { from { stroke-dasharray: 0 400; } }
   .scr.on .cs svg path.ln { stroke-dasharray: 1; stroke-dashoffset: 0; animation: lndraw 1.8s ease-out .2s both; }
@@ -284,11 +293,11 @@ function drawMap(svg, W, H) {
   pts.forEach((q, i) => {
     const n = +q.s.tools || 0, c = col(+q.s.value || 0, +q.s.oldest || 0), name = String(q.s.name).toUpperCase();
     const ex = q.t[0], ey = q.t[1], mx = (A[0] + ex) / 2, my = (A[1] + ey) / 2 - Math.hypot(ex - A[0], ey - A[1]) * .14;
-    lines += `<path id="sm${i}" d="M${A[0]},${A[1]} Q${mx},${my} ${ex},${ey}" fill="none" stroke="${c}" stroke-width="${(f * .2 + Math.min(n, 20) * f * .07).toFixed(1)}" stroke-linecap="round" opacity=".78"/>`;
+    lines += `<path id="sm${i}" d="M${A[0]},${A[1]} Q${mx},${my} ${ex},${ey}" fill="none" pathLength="1" class="smln" style="--d:${i}" stroke="${c}" stroke-width="${(f * .2 + Math.min(n, 20) * f * .07).toFixed(1)}" stroke-linecap="round" opacity=".78"/>`;
     if (n >= thr) lines += `<path d="M1,0L.35,.12L-.1,.9L-.3,.9L-.15,.1L-.7,.07L-.85,.35L-1,.35L-.95,0L-1,-.35L-.85,-.35L-.7,-.07L-.15,-.1L-.3,-.9L-.1,-.9L.35,-.12Z" transform="scale(${(f * 1.05).toFixed(1)})" fill="#fff" stroke="#050e1a" stroke-width=".07" stroke-linejoin="round"><animateMotion dur="${9 + (i % 5) * 1.6}s" begin="-${(i * 1.7).toFixed(1)}s" rotate="auto" repeatCount="indefinite"><mpath href="#sm${i}"/></animateMotion></path>`;
     if (Math.hypot(q.x - q.t[0], q.y - q.t[1]) > 4) pins += `<line x1="${q.t[0]}" y1="${q.t[1]}" x2="${q.x}" y2="${q.y}" stroke="#9fb8d6" stroke-width="1.5" stroke-dasharray="2 4"/><circle cx="${q.t[0]}" cy="${q.t[1]}" r="${(f * .3).toFixed(1)}" fill="${c}" stroke="#050e1a" stroke-width="2"/>`;
     const east = q.lo > -100 || q.x > A[0];
-    st += `<circle cx="${q.x}" cy="${q.y}" r="${r}" fill="${c}" stroke="#050e1a" stroke-width="2"/><text x="${q.x}" y="${q.y + f * .32}" text-anchor="middle" font-size="${(f * .85).toFixed(1)}" font-weight="800" fill="#050e1a">${n}</text><text x="${q.x + (east ? r + 6 : -r - 6)}" y="${q.y + f * .36}" text-anchor="${east ? 'start' : 'end'}" font-size="${f}" font-weight="800" fill="#eef5fc" letter-spacing="1">${esc(name)}</text>`;
+    st += `<g class="smst" style="--d:${i}"><circle cx="${q.x}" cy="${q.y}" r="${r}" fill="${c}" stroke="#050e1a" stroke-width="2"/><text x="${q.x}" y="${q.y + f * .32}" text-anchor="middle" font-size="${(f * .85).toFixed(1)}" font-weight="800" fill="#050e1a">${n}</text><text x="${q.x + (east ? r + 6 : -r - 6)}" y="${q.y + f * .36}" text-anchor="${east ? 'start' : 'end'}" font-size="${f}" font-weight="800" fill="#eef5fc" letter-spacing="1">${esc(name)}</text></g>`;
   });
   g += pins + lines + st + `<circle class="smring" cx="${A[0]}" cy="${A[1]}" r="6"/><circle cx="${A[0]}" cy="${A[1]}" r="${(f * .5).toFixed(1)}" fill="#fff" stroke="#38bdf8" stroke-width="3"/><text x="${A[0] - f * .8}" y="${A[1] + f * 1.4}" text-anchor="end" font-size="${(f * 1.1).toFixed(1)}" font-weight="800" fill="#eef5fc">ATL</text>`;
   svg.setAttribute('viewBox', `0 0 ${W} ${H}`); svg.innerHTML = g;
