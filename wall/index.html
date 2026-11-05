@@ -103,6 +103,7 @@
   .row .a small { display: block; margin-top: .3cqh; font-size: 2cqh; font-weight: 500; color: var(--mut); overflow: hidden; text-overflow: ellipsis; }
   .row .b { font-size: 4.2cqh; font-weight: 800; font-variant-numeric: tabular-nums; text-align: right; white-space: nowrap; }
   .row .b.red { color: #ff7b7b; } .row .b.amber { color: #fbbf24; }
+  .note.now { font-size: 3.4cqh; color: #9bb7d4; } .note.now b { font-size: 4.8cqh; }
   .note { font-size: 2.8cqh; color: var(--mut); line-height: 1.35; }
 
   /* gauge */
@@ -330,11 +331,11 @@ function buildScreens() {
   add('ct', 'The most valuable tools still out', 'Tool number and how long it has been out',
     rowsList((ct.priciest || []).slice(0, 5).map(o => ({ a: o.id, b: String(o.days).toLowerCase() + ' out', c: '' }))));
   add('ct', 'Are fewer tools out than before?', 'Number of Central Tooling tools out, over time',
-    `<div class="note">${num(f.out)} on ${f.d ? f.d.slice(5).replace('-', '/') : 'day one'} → <b style="color:#fff">${num(ct.out)}</b> today</div><div class="chartbox">${chart(tr, 'out', '#38bdf8', v => num(Math.round(v)))}</div>`);
+    `<div class="note now">${num(f.out)} on ${f.d ? f.d.slice(5).replace('-', '/') : 'day one'} → <b style="color:#fff">${num(ct.out)}</b> today</div><div class="chartbox">${chart(tr, 'out', '#38bdf8', v => num(Math.round(v)))}</div>`);
   add('ct', 'Is less money out than before?', 'Dollar value of Central Tooling tools out, over time',
-    `<div class="note">${money(f.value)} → <b style="color:#fff">${money(ct.value)}</b> today</div><div class="chartbox">${chart(tr, 'value', '#f87171', money)}</div>`);
+    `<div class="note now">${money(f.value)} → <b style="color:#fff">${money(ct.value)}</b> today</div><div class="chartbox">${chart(tr, 'value', '#f87171', money)}</div>`);
   if (tr.length > 2 && tr.some(t => t.crit != null)) add('ct', 'Tools gone 30+ days, over time', 'Number of Central Tooling tools that have been out 30 days or more',
-    `<div class="note">${num(f.crit)} on ${f.d ? f.d.slice(5).replace('-', '/') : 'day one'} → <b style="color:#fff">${num(ct.crit)}</b> today</div><div class="chartbox">${chart(tr, 'crit', '#f59e0b', v => num(Math.round(v)))}</div>`);
+    `<div class="note now">${num(f.crit)} on ${f.d ? f.d.slice(5).replace('-', '/') : 'day one'} → <b style="color:#fff">${num(ct.crit)}</b> today</div><div class="chartbox">${chart(tr, 'crit', '#f59e0b', v => num(Math.round(v)))}</div>`);
   add('ct', 'Share of our tools that came back', 'Of all the tools we sent out, how many have been returned',
     `<div class="gauge">${gauge(ct.recoveryRate)}<div class="gtxt"><div class="note">of tools sent out have come back</div></div></div>` + tiles([{ v: num(ct.recovered), l: 'Tools returned' }, { v: money(ct.recoveredValue), l: 'Dollars recovered', c: 'green' }]) + `<div class="chartbox" style="flex:1;min-height:0">${chart(tr, 'rate', '#22c55e', v => Math.round(v * 100) + '%', [0, 1], [800, 420])}</div>`);
   add('ct', 'How far we have come', 'Change since we started tracking on ' + (f.d ? f.d.slice(5).replace('-', '/') : 'day one'),
