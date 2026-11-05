@@ -56,16 +56,16 @@
   .tiles { flex: 1 1 0; min-height: 0; display: grid; grid-template-columns: repeat(var(--n, 3), 1fr); grid-auto-rows: minmax(0, 1fr); gap: 1.78cqh; }
   .body:has(.rows) > .tiles, .body:has(.bars) > .tiles, .body:has(.gauge) > .tiles, .body:has(.chartbox) > .tiles, .body:has(.says) > .tiles { flex: none; height: 20cqh; }
   .tile { container-type: size; display: flex; flex-direction: column; justify-content: center; overflow: hidden; background: #0f2238; border: 1px solid var(--line); border-radius: 1.78cqh; padding: 0 1.78cqh; min-width: 0; }
-  .tile .v { white-space: nowrap; font-size: min(38cqh, 17cqw); font-weight: 800; line-height: 1.02; font-variant-numeric: tabular-nums; }
-  .tile .l { margin-top: 5cqh; font-size: min(14cqh, 6.4cqw); font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--mut); line-height: 1.15; }
-  .tile .s { margin-top: 3cqh; font-size: min(13cqh, 6cqw); color: #b5cbe2; line-height: 1.15; }
+  .tile .v { white-space: nowrap; font-size: min(46cqh, 19cqw); font-weight: 800; line-height: 1.02; font-variant-numeric: tabular-nums; }
+  .tile .l { margin-top: 3cqh; font-size: min(13cqh, 6.4cqw); font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--mut); line-height: 1.15; }
+  .tile .s { margin-top: 2cqh; font-size: min(11cqh, 6cqw); color: #b5cbe2; line-height: 1.15; }
   /* in narrow panels the number sits to the left of its label, as big as the box allows (the query only sees .tile, so the rest is passed down through variables) */
-  .tile .v { grid-column: var(--vc, auto); grid-row: var(--vr, auto); font-size: var(--vf, min(38cqh, 17cqw)); }
-  .tile .l { grid-column: var(--lc, auto); grid-row: var(--lr, auto); margin-top: var(--lm, 5cqh); align-self: var(--la, auto); font-size: var(--lf, min(14cqh, 6.4cqw)); }
-  .tile .s { grid-column: var(--lc, auto); grid-row: var(--sr, auto); margin-top: var(--sm, 3cqh); align-self: var(--sa, auto); font-size: var(--sf, min(13cqh, 6cqw)); }
+  .tile .v { grid-column: var(--vc, auto); grid-row: var(--vr, auto); font-size: var(--vf, min(46cqh, 19cqw)); }
+  .tile .l { grid-column: var(--lc, auto); grid-row: var(--lr, auto); margin-top: var(--lm, 3cqh); align-self: var(--la, auto); font-size: var(--lf, min(13cqh, 6.4cqw)); }
+  .tile .s { grid-column: var(--lc, auto); grid-row: var(--sr, auto); margin-top: var(--sm, 2cqh); align-self: var(--sa, auto); font-size: var(--sf, min(11cqh, 6cqw)); }
   .tile .l:last-child { grid-row: var(--lr1, auto); align-self: var(--la1, auto); }
   @container (aspect-ratio < 1) { .tile { display: grid; grid-template-columns: auto minmax(0, 1fr); grid-template-rows: 1fr 1fr; align-items: center; column-gap: 4cqw; row-gap: 0;
-    --vc: 1; --vr: 1 / span 2; --vf: min(68cqh, 14cqw); --lc: 2; --lr: 1; --lm: 0; --la: end; --lf: min(19cqh, 4.6cqw); --sr: 2; --sm: .5cqh; --sa: start; --sf: min(15cqh, 3.8cqw); --lr1: 1 / span 2; --la1: center; } }
+    --vc: 1; --vr: 1 / span 2; --vf: min(84cqh, 17cqw); --lc: 2; --lr: 1; --lm: 0; --la: end; --lf: min(21cqh, 5cqw); --sr: 2; --sm: .5cqh; --sa: start; --sf: min(18cqh, 4.4cqw); --lr1: 1 / span 2; --la1: center; } }
   @container (aspect-ratio < 1) { .tiles { grid-template-columns: 1fr; } .body:has(.rows) > .tiles, .body:has(.bars) > .tiles, .body:has(.gauge) > .tiles, .body:has(.chartbox) > .tiles, .body:has(.says) > .tiles { height: calc(var(--n, 3) * 11cqh); } }
   .tile.red .v { color: #ff7b7b; } .tile.amber .v { color: #fbbf24; } .tile.green .v { color: #5eea96; }
 
@@ -279,11 +279,12 @@ function drawMap(svg, W, H) {
   pts.forEach(q => { q.x = Math.max(mx0 * .5, Math.min(W - mx0 * .5, q.x)); q.y = Math.max(my0, Math.min(H - my0, q.y)); });
   let g = `<path d="M${US_OUT.map(([lo, la]) => P(la, lo).join(',')).join('L')}Z" fill="#0f2542" stroke="#2b4b78" stroke-width="1.5" stroke-linejoin="round"/>`;
   let lines = '', st = '', pins = '';
+  const thr = Math.max(1, pts.map(q => +q.s.tools || 0).sort((x, y) => y - x)[7] || 1);
   pts.forEach((q, i) => {
     const n = +q.s.tools || 0, c = col(+q.s.value || 0, +q.s.oldest || 0), name = String(q.s.name).toUpperCase();
     const ex = q.t[0], ey = q.t[1], mx = (A[0] + ex) / 2, my = (A[1] + ey) / 2 - Math.hypot(ex - A[0], ey - A[1]) * .14;
     lines += `<path id="sm${i}" d="M${A[0]},${A[1]} Q${mx},${my} ${ex},${ey}" fill="none" stroke="${c}" stroke-width="${(f * .2 + Math.min(n, 20) * f * .07).toFixed(1)}" stroke-linecap="round" opacity=".78"/>`;
-    if (i % 2 === 0) lines += `<circle r="${(f * .2).toFixed(1)}" fill="#fff"><animateMotion dur="${8 + i * 1.5}s" repeatCount="indefinite"><mpath href="#sm${i}"/></animateMotion></circle>`;
+    if (n >= thr) lines += `<path d="M1,0L.35,.12L-.1,.9L-.3,.9L-.15,.1L-.7,.07L-.85,.35L-1,.35L-.95,0L-1,-.35L-.85,-.35L-.7,-.07L-.15,-.1L-.3,-.9L-.1,-.9L.35,-.12Z" transform="scale(${(f * 1.05).toFixed(1)})" fill="#fff" stroke="#050e1a" stroke-width=".07" stroke-linejoin="round"><animateMotion dur="${9 + (i % 5) * 1.6}s" begin="-${(i * 1.7).toFixed(1)}s" rotate="auto" repeatCount="indefinite"><mpath href="#sm${i}"/></animateMotion></path>`;
     if (Math.hypot(q.x - q.t[0], q.y - q.t[1]) > 4) pins += `<line x1="${q.t[0]}" y1="${q.t[1]}" x2="${q.x}" y2="${q.y}" stroke="#9fb8d6" stroke-width="1.5" stroke-dasharray="2 4"/><circle cx="${q.t[0]}" cy="${q.t[1]}" r="${(f * .3).toFixed(1)}" fill="${c}" stroke="#050e1a" stroke-width="2"/>`;
     const east = q.lo > -100 || q.x > A[0];
     st += `<circle cx="${q.x}" cy="${q.y}" r="${r}" fill="${c}" stroke="#050e1a" stroke-width="2"/><text x="${q.x}" y="${q.y + f * .32}" text-anchor="middle" font-size="${(f * .85).toFixed(1)}" font-weight="800" fill="#050e1a">${n}</text><text x="${q.x + (east ? r + 6 : -r - 6)}" y="${q.y + f * .36}" text-anchor="${east ? 'start' : 'end'}" font-size="${f}" font-weight="800" fill="#eef5fc" letter-spacing="1">${esc(name)}</text>`;
@@ -303,7 +304,7 @@ function buildScreens() {
   const L = all.lines || [], hd = all.headline || [], oc = ct.outreach || {}, sb = ct.sinceBaseline || {};
   const S = [];
   // add(group, plain-English title, what-it-means line, content)
-  const add = (tag, t, sub, h) => S.push({ tag, t, sub, h });
+  const add = (tag, t, sub, h, wide) => S.push({ tag, t, sub, h, wide });
   const MON = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
   const monName = m => { const p = String(m || '').split('-'); return p.length > 1 ? MON[(+p[1] || 1) - 1] + ' ' + p[0] : String(m || ''); };
   const room = s => title(String(s || '').replace(/INTERNATIONA$/i, 'INTERNATIONAL').replace(/\s*TOOL(\s*R(O|OO|OOM)?)?$/i, '').replace(/^593\s+/, '').replace(/\s593\s/, ' ').replace(/\s*-\s*$/, '')).replace(/^(\w{3})\s/, (m, a) => a.toUpperCase() + ' ').replace(/\bToc5\b/, 'TOC5');
@@ -323,7 +324,7 @@ function buildScreens() {
     bars((ct.bands || []).map(b => ({ n: title(b.name).replace(/\((.*?)\)/, (m, a) => '(' + a.replace(/-/g, '–') + ' days)'), v: b.count, c: bandCls(b.name) }))));
   add('ct', 'Stations holding the most of our money', 'Dollar value of our tools sitting at each station',
     bars((ct.stations || []).slice().sort((a, b) => b.value - a.value).slice(0, 5).map(s => ({ n: s.name, v: s.value, label: money(s.value), small: num(s.tools) + (s.tools === 1 ? ' tool' : ' tools') }))));
-  if ((ct.chase || ct.stations || []).some(s => STN_LL[String(s.name).toUpperCase()])) add('ct', 'Where our tools are', 'Each line is a station holding Central Tooling tools. Thicker line means more tools.', stationMap(ct.chase || ct.stations || []));
+  if ((ct.chase || ct.stations || []).some(s => STN_LL[String(s.name).toUpperCase()])) add('ct', 'Where our tools are', 'Each line is a station holding Central Tooling tools. Thicker line means more tools.', stationMap(ct.chase || ct.stations || []), true);
   add('ct', 'The tools that have been out longest', 'Tool number and how many days it has been gone',
     rowsList((ct.oldest || []).slice(0, 5).map(o => ({ a: o.id, b: String(o.days).toLowerCase(), c: 'red' }))));
   add('ct', 'The most valuable tools still out', 'Tool number and how long it has been out',
@@ -361,7 +362,8 @@ function buildScreens() {
       add('mv', 'Shipments, month by month', 'Number of shipments handled each month. The newest month is still adding up.',
         bars(m.byMonth.map(r => ({ n: title(r.m), v: r.total, small: String(r.m).toUpperCase() === cur ? 'so far' : '' }))));
     }
-    if ((m.byDow || []).length) add('mv', 'Shipments by day of the week', 'Shipments handled on each day of the week since we started counting',
+    m.byDow = (m.byDow || []).filter(r => /^(MON|TUES|WEDNES|THURS|FRI|SATUR|SUN)DAY$/i.test(String(r.d).trim()));
+    if (m.byDow.length) add('mv', 'Shipments by day of the week', 'Shipments handled on each day of the week since we started counting',
       bars(m.byDow.map(r => ({ n: title(r.d), v: r.total, small: num(r.atl) + ' from ATL' + (r.out ? ' + ' + num(r.out) + ' between stations' : '') }))));
     add('mv', 'Busy times and top reasons', 'What the shipment record shows since we started counting',
       tiles([{ v: esc(title(m.busiestDay)), l: 'Busiest day of the week', s: m.busiestDayNote }, { v: esc(m.topReason), l: 'Most common reason', s: m.topReasonNote }]) + tiles([{ v: pct(m.planeShare), l: 'Of shipments are for planes that are down', s: m.planeNote, c: 'red' }, { v: pct(m.weekend), l: 'Of shipments happen on weekends' }]));
@@ -444,6 +446,16 @@ function buildScreens() {
     const tA = sum('assigned'), tW = sum('away'), tO = sum('overdue');
     add('cr', 'Tools that belong to our tool rooms', 'Every tool assigned to a Dept 593 tool room, and how many are away or overdue',
       hero('Tools assigned to our tool rooms', num(tA), null, '', true) + tiles([{ v: num(tW), l: 'Away from their room', s: p1(tA ? tW / tA : 0) + ' of all', c: 'amber' }, { v: num(tO), l: 'Overdue', s: p1(tA ? tO / tA : 0) + ' of all', c: 'red' }, { v: money(sum('valueAway')), l: 'Value away' }]));
+    {
+      const BASE = /R\.?I\.?D\.?\s*TOC3|BAY 8|BAY 6|BAY 12/i, LINE = /TOC5|A-CONC|B-CONC|INTERNATIONA/i;
+      const grp = re => { const g = R.filter(r => re.test(String(r.name))); const f = k => g.reduce((a, r) => a + (r[k] || 0), 0); return { n: g.length, a: f('assigned'), w: f('away'), o: f('overdue'), v: f('valueAway') }; };
+      const gb = grp(BASE), gl = grp(LINE);
+      if (gb.n && gl.n) add('cr', 'Base and Line tool rooms', 'Base: Bay 6, Bay 8, Bay 12 and RID.  Line: TOC5, A Concourse, B Concourse and International.',
+        rowsList([
+          { a: 'Base tool rooms', sub: num(gb.a) + ' tools assigned · ' + num(gb.o) + ' overdue · ' + money(gb.v) + ' away', b: num(gb.w) + ' away', c: 'amber' },
+          { a: 'Line tool rooms', sub: num(gl.a) + ' tools assigned · ' + num(gl.o) + ' overdue · ' + money(gl.v) + ' away', b: num(gl.w) + ' away', c: 'amber' }]) +
+        tiles([{ v: num(gb.a + gl.a), l: 'Tools assigned to Base and Line' }, { v: num(gb.w + gl.w), l: 'Away from their room', s: p1((gb.a + gl.a) ? (gb.w + gl.w) / (gb.a + gl.a) : 0) + ' of all', c: 'amber' }, { v: num(gb.o + gl.o), l: 'Overdue', c: 'red' }]));
+    }
     add('cr', 'How healthy are our tool rooms?', 'A room is green when under 1.5% of its tools are overdue, amber at 1.5%–3%, red at 3% or more',
       tiles([{ v: cnt('GREEN'), l: 'Green: healthy', c: 'green' }, { v: cnt('AMBER'), l: 'Amber: watch', c: 'amber' }]) + tiles([{ v: cnt('RED'), l: 'Red: needs help', c: 'red' }, { v: R.length, l: 'Tool rooms in all' }]) + `<div class="note">Across the other ${num((O.red || 0) + (O.amber || 0) + (O.green || 0) + (O.small || 0))} ATL cribs: ${num(O.red || 0)} red, ${num(O.amber || 0)} amber, ${num(O.green || 0)} green</div>`);
     add('cr', 'Tools in each tool room', 'Number of tools assigned to each Dept 593 tool room (largest six)',
@@ -489,12 +501,20 @@ function countUps(root) {
   ['.tile', '.row', '.bar', '.goal', '.say', '.hero', '.chip'].forEach(sel => root.querySelectorAll(sel).forEach((el, i) => el.style.setProperty('--k', i)));
   root.querySelectorAll('.bar').forEach((el, i) => { const b = el.querySelector('.t b'); if (b) b.style.setProperty('--k', i); });
 }
+let nextI = 0;
+const isWide = k => !!(screens[k] && screens[k].wide) && mode === 'stack' && cols >= 2;
 function show(i) {
-  i = Math.floor(i / cols) * cols; cur = i;
-  const nS = scrEls.length;
+  const nS = scrEls.length; if (!nS) return;
+  i = ((i % nS) + nS) % nS; cur = i;
+  const shown = []; let used = 0;
+  for (let t = 0; t < nS && used < cols; t++) { const k = (i + t) % nS, w = isWide(k) ? 2 : 1; if (used + w > cols) continue; shown.push(k); used += w; }
+  let adv = 0; while (adv < nS && shown.includes((i + adv) % nS)) adv++;
+  nextI = (i + (adv || nS)) % nS;
   scrEls.forEach((e, k) => {
-    const rel = (k - i + nS) % nS, on = rel < cols, dest = (mode === 'mixed' && rel === 1) ? $('#stage2') : $('#stage');
+    const pos = shown.indexOf(k), on = pos >= 0, dest = (mode === 'mixed' && pos === 1) ? $('#stage2') : $('#stage');
     if (e.parentNode !== dest) dest.appendChild(e);
+    e.style.gridColumn = on && isWide(k) ? 'span 2' : '';
+    e.style.order = on ? pos : '';
     if (on && !e.classList.contains('on')) countUps(e); e.classList.toggle('on', on); });
 }
 function mount() {
@@ -506,7 +526,7 @@ function mount() {
   fitMaps();
   show(cur);
   if (timer) clearInterval(timer);
-  timer = setInterval(() => show((cur + cols) % screens.length), ROTATE_SEC * 1000);
+  timer = setInterval(() => show(nextI), ROTATE_SEC * 1000);
 }
 
 // ── live board (left): the board's own TV view, scaled to the box ────────────
@@ -540,7 +560,7 @@ function applyLayout() {
   const wrap = $('.wrap'); wrap.classList.toggle('stack', mode === 'stack'); wrap.classList.toggle('mixed', mode === 'mixed');
   const bandH = fitBoard(), Hh = wrap.clientHeight;
   const c = mode === 'stack' ? ((Hh - bandH) / Hh >= 0.5 ? 3 : 2) : mode === 'mixed' ? 2 : 1;
-  if (c !== cols || was !== mode) { cols = c; $('#stage').style.setProperty('--cols', mode === 'mixed' ? 1 : cols); if (screens.length) { show(cur); if (timer) { clearInterval(timer); timer = setInterval(() => show((cur + cols) % screens.length), ROTATE_SEC * 1000); } } }
+  if (c !== cols || was !== mode) { cols = c; $('#stage').style.setProperty('--cols', mode === 'mixed' ? 1 : cols); if (screens.length) { show(cur); if (timer) { clearInterval(timer); timer = setInterval(() => show(nextI), ROTATE_SEC * 1000); } } }
 }
 addEventListener('message', e => {
   const d = e.data; if (!d || !d.ctb) return;
