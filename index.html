@@ -375,7 +375,7 @@ async function undo(id) {
 }
 document.addEventListener('click', e => {
   const fi = e.target.closest('a.fi');
-  if (fi) { const n = fi.dataset.fn; try { navigator.clipboard.writeText(n).then(() => toast('Flight ' + n + ' copied. Paste it in the Delta app.'), () => {}); } catch (x) {} return; }
+  if (fi) { const n = fi.dataset.fn; let ok = false; try { const ta = document.createElement('textarea'); ta.value = n; ta.setAttribute('readonly', ''); ta.style.cssText = 'position:fixed;top:0;left:0;opacity:0;font-size:16px'; document.body.appendChild(ta); ta.focus(); ta.select(); ta.setSelectionRange(0, 99); ok = document.execCommand('copy'); ta.remove(); } catch (x) {} if (!ok) { try { navigator.clipboard.writeText(n); } catch (x) {} } toast('Flight ' + n + ' copied. Paste it in the Delta app.'); return; }
   const t = e.target.closest('[data-tab],[data-a]'); if (!t) return;
   if (t.dataset.tab) { tab = t.dataset.tab; render(true); return; }
   const id = +t.dataset.id, a = t.dataset.a;
