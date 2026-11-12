@@ -57,13 +57,14 @@ main { padding: 12px 12px calc(30px + env(safe-area-inset-bottom)); display: fle
 .rtrow { display: flex; align-items: center; gap: 10px; }
 .rt { display: flex; align-items: center; gap: 8px; font-size: 30px; font-weight: 800; letter-spacing: .02em; line-height: 1; }
 .rt svg { width: 28px; height: 16px; fill: var(--c); flex: none; }
-.cdw { margin-left: auto; text-align: right; }
-.cd { display: inline-block; font-size: 20px; font-weight: 800; font-variant-numeric: tabular-nums; white-space: nowrap; padding: 5px 12px; border-radius: 999px; background: color-mix(in srgb, var(--c) 22%, transparent); color: color-mix(in srgb, var(--c) 55%, #fff); border: 1px solid color-mix(in srgb, var(--c) 50%, transparent); }
+.cdw { margin-left: auto; text-align: right; min-width: 0; max-width: 62%; }
+.cd.lg { font-size: 20px; }
+.cd { display: inline-block; font-size: 26px; font-weight: 800; font-variant-numeric: tabular-nums; white-space: nowrap; padding: 6px 14px; border-radius: 999px; background: color-mix(in srgb, var(--c) 22%, transparent); color: color-mix(in srgb, var(--c) 55%, #fff); border: 1px solid color-mix(in srgb, var(--c) 50%, transparent); }
 .card.r .cd { animation: tvpulse 1.4s ease-in-out infinite; }
 @keyframes tvpulse { 0%,100% { filter: brightness(1); } 50% { filter: brightness(1.5); } }
-.cdw small { display: block; margin-top: 3px; font-size: 10.5px; color: var(--mut); font-weight: 700; letter-spacing: .06em; text-transform: uppercase; }
+.cdw small { display: block; margin-top: 4px; font-size: 12px; color: var(--mut); font-weight: 700; letter-spacing: .06em; text-transform: uppercase; }
 .chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 9px; }
-.tag { display: inline-block; font-size: 11px; font-weight: 800; border-radius: 7px; padding: 3px 8px; letter-spacing: .04em; }
+.tag { display: inline-block; font-size: 16px; font-weight: 800; border-radius: 9px; padding: 4px 11px; letter-spacing: .04em; }
 .tag.type { background: #1e3a6e; color: #bcd6ff; } .tag.aos { background: var(--dred); color: #fff; }
 .tag.late { background: #5b1a1a; color: #ffb4b4; } .tag.early { background: #14532d; color: #b7f5cd; }
 .tag.tr { background: #0c4a6e; color: #bae6fd; } .tag.test { background: #facc15; color: #713f12; }
@@ -110,6 +111,19 @@ main { padding: 12px 12px calc(30px + env(safe-area-inset-bottom)); display: fle
 .sheet .acts { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 18px; }
 .sheet .acts button { border: 0; border-radius: 13px; padding: 15px; font: inherit; font-weight: 800; font-size: 16px; background: #1b324f; color: #dbeafe; }
 .sheet .acts .save { background: linear-gradient(180deg, #1b63b0, #0f4a8d); color: #fff; }
+.hero { display: grid; grid-template-columns: 1.3fr 1fr 1fr; gap: 8px; margin-top: 12px; }
+.hero > div { background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.09); border-radius: 12px; padding: 8px 10px 9px; min-width: 0; }
+.hero b { display: block; color: var(--mut); font-size: 12px; letter-spacing: .1em; text-transform: uppercase; font-weight: 800; }
+.hero span { display: block; font-size: 29px; font-weight: 800; line-height: 1.1; margin-top: 2px; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.hero .old { display: block; font-size: 13px; font-weight: 600; text-decoration: line-through; color: var(--mut); line-height: 1; margin-bottom: 1px; }
+.hero .gt { background: rgba(250,204,21,.14); border-color: rgba(250,204,21,.55); } .hero .gt span { color: #fde68a; }
+.hero .ng span { font-size: 15px; color: var(--mut); font-weight: 700; margin-top: 9px; }
+.minor { display: flex; flex-wrap: wrap; gap: 4px 18px; margin-top: 10px; font-size: 14px; font-weight: 600; color: #c3d6ec; }
+.minor b { color: var(--mut); font-size: 11px; letter-spacing: .08em; text-transform: uppercase; margin-right: 5px; font-weight: 800; }
+.btns { row-gap: 10px; }
+.btns > :first-child, .btns .go { grid-column: 1 / -1; }
+.btns > :first-child { min-height: 56px; font-size: 17px; }
+.btns .go { min-height: 56px; font-size: 17px; margin-top: 4px; }
 @media (prefers-reduced-motion: reduce) { * { animation: none !important; } }
 </style>
 </head>
@@ -188,18 +202,14 @@ function card(r) {
   const parts = String(j.route || '').split(/[-–]/);
   const rt = parts.length > 1 ? `<b>${esc(parts[0])}</b>${PLANE}<b>${esc(parts[1])}</b>` : `<b>${esc(j.route || '')}</b>`;
   const chips = (j.isTest ? '<span class="tag test">TEST</span>' : '') + (j.type ? `<span class="tag ${/AOS/i.test(j.type) ? 'aos' : 'type'}">${esc(j.type)}</span>` : '') + (d === 0 ? '' : `<span class="tag ${d > 0 ? 'late' : 'early'}">${d > 0 ? 'DELAYED +' : 'EARLIER -'}${dur(d)}</span>`);
-  const f = [];
-  if (j.flt) f.push(['Flight', esc(j.flt)]);
-  f.push([label, (d !== 0 && j.origTime ? '<span class="old">' + esc(fmtT(j.origTime)) + '</span>' : '') + esc(fmtT(j.time))]);
-  if (j.gate) f.push(['Gate', esc(j.gate)]);
-  if (j.ac) f.push(['A/C', esc(j.ac)]);
-  if (j.tail) f.push(['Tail', esc(j.tail)]);
-  if (j.awb) f.push(['AWB', esc(j.awb)]);
+  const timeH = (d !== 0 && j.origTime ? '<s class="old">' + esc(fmtT(j.origTime)) + '</s>' : '') + esc(fmtT(j.time));
+  const hero = `<div class="hero"><div><b>Flight</b><span>${j.flt ? esc(j.flt) : '&mdash;'}</span></div><div><b>${label}</b><span>${timeH}</span></div><div class="${j.gate ? 'gt' : 'ng'}"><b>Gate</b><span>${j.gate ? esc(j.gate) : 'Not set'}</span></div></div>`;
+  const minor = [['A/C', j.ac], ['Tail', j.tail], ['AWB', j.awb]].filter(x => x[1]).map(x => `<span><b>${x[0]}</b>${esc(x[1])}</span>`).join('');
   const pct = j.transit || m == null ? 0 : Math.max(0, Math.min(100, 100 * (1 - m / 180)));
-  return `<div class="card ${c}"><div class="rtrow"><div class="rt">${rt}</div><div class="cdw">${cd ? `<span class="cd">${cd}</span>` : ''}<small>${cdl}</small></div></div>
-${chips ? `<div class="chips">${chips}</div>` : ''}<div class="facts">${f.map(x => `<div><b>${x[0]}</b><span>${x[1]}</span></div>`).join('')}</div>${j.comments ? `<div class="note">${esc(j.comments)}</div>` : ''}
+  return `<div class="card ${c}"><div class="rtrow"><div class="rt">${rt}</div><div class="cdw">${cd ? `<span class="cd${cd.length > 7 ? ' lg' : ''}">${cd}</span>` : ''}<small>${cdl}</small></div></div>
+${chips ? `<div class="chips">${chips}</div>` : ''}${hero}${minor ? `<div class="minor">${minor}</div>` : ''}${j.comments ? `<div class="note">${esc(j.comments)}</div>` : ''}
 <div class="trk"><b style="width:${pct.toFixed(0)}%"></b>${j.transit ? PLANE : `<span style="position:absolute;left:${pct.toFixed(0)}%;top:50%;width:0;height:0">${PLANE.replace('<svg', '<svg style="position:absolute;left:-11px;top:-9px;width:22px;height:18px;fill:#fff;filter:drop-shadow(0 2px 2px rgba(0,0,0,.6))"')}</span>`}</div>
-<div class="btns">${url ? `<a href="${url}" target="_blank" rel="noopener">&#8599; Flight info</a>` : '<span class="nf">No flight #</span>'}
+<div class="btns">${url ? `<a class="fi" data-fn="${esc((String(j.flt || '').match(/(\d{1,4})\s*$/) || [,''])[1])}" href="${url}" target="_blank" rel="noopener">&#8599; Flight info <small style="font-weight:600;opacity:.75">&middot; copies flight #</small></a>` : '<span class="nf">No flight #</span>'}
 <button type="button" class="en ${j.transit ? 'on' : ''}" data-a="transit" data-id="${j.id}"${busy}>&#9992; ${j.transit ? 'En route (undo)' : 'En route'}</button>
 <button type="button" data-a="edit" data-id="${j.id}"${busy}>&#9998; Edit</button>
 <button type="button" class="go" data-a="done" data-id="${j.id}" data-l="${done}"${busy}>&check; ${done}</button></div>
@@ -364,6 +374,8 @@ async function undo(id) {
   const r = await api('POST', '/api/jobs/' + id + '/undo'); if (!r) { if (k) k.done = true; render(true); }
 }
 document.addEventListener('click', e => {
+  const fi = e.target.closest('a.fi');
+  if (fi) { const n = fi.dataset.fn; try { navigator.clipboard.writeText(n).then(() => toast('Flight ' + n + ' copied. Paste it in the Delta app.'), () => {}); } catch (x) {} return; }
   const t = e.target.closest('[data-tab],[data-a]'); if (!t) return;
   if (t.dataset.tab) { tab = t.dataset.tab; render(true); return; }
   const id = +t.dataset.id, a = t.dataset.a;
