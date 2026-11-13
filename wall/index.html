@@ -22,6 +22,31 @@
   .wrap.stack { grid-template-columns: 1fr; grid-template-rows: var(--bh, 30vh) 1fr; gap: .6vh; }
   .wrap.stack .side { padding: 0 .9vw 1.2vh .9vw; }
   #stage2 { display: none; }
+  #mini { display: none; }
+  .wrap.solo .side { display: none; }
+  .wrap.solo #mini { display: flex; gap: 1vw; margin: 0 .9vw 1vh; container-type: size; position: relative; min-height: 0; }
+  #mini .bx { flex: var(--w, 1) 1 0; min-width: 0; min-height: 0; display: flex; flex-direction: column; gap: 2cqh; padding: 6cqh 1.2vw 7cqh; background: var(--card); border: 1px solid var(--line); border-radius: 1vw; overflow: hidden; animation: scrin .6s ease-out; }
+  #mini .bt { flex: none; font-size: max(min(11cqh, 2.4vh), 1.8vh); line-height: 1.1; letter-spacing: .1em; text-transform: uppercase; color: #8fb2d4; font-weight: 800; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  #mini .bt small { margin-left: .8vw; font-size: .8em; letter-spacing: .02em; text-transform: none; font-weight: 600; color: #6f8fb0; }
+  #mini .bb { flex: 1; min-height: 0; display: flex; align-items: center; justify-content: center; gap: .8vw; }
+  #mini .n { flex: none; font-size: max(min(36cqh, 7.2vh), 4vh); line-height: 1; font-weight: 800; color: #fff; white-space: nowrap; }
+  #mini .ch { flex: 1; min-width: 0; height: 100%; max-height: 46cqh; display: flex; flex-direction: column; align-items: center; justify-content: center; background: rgba(255,255,255,.05); border-radius: .6vw; padding: 0 .4vw; }
+  #mini .ch b { font-size: max(min(18cqh, 3.8vh), 2.6vh); line-height: 1.05; font-weight: 800; color: #fff; white-space: nowrap; }
+  #mini .ch span { font-size: max(min(11cqh, 2.3vh), 1.7vh); color: #9db2cc; font-weight: 700; white-space: nowrap; }
+  #mini .seg { height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; border-radius: .5vw; min-width: 0; color: #06121f; }
+  #mini .seg b { font-size: max(min(24cqh, 4.8vh), 2.8vh); line-height: 1; font-weight: 800; } #mini .seg span { font-size: max(min(10cqh, 2vh), 1.6vh); font-weight: 800; letter-spacing: .03em; white-space: nowrap; }
+  #mini svg { flex: 1; height: 100%; min-width: 0; }
+  #mini .bar { flex: 1; height: 34%; border-radius: 99px; background: rgba(255,255,255,.1); overflow: hidden; } #mini .bar i { display: block; height: 100%; background: #22c55e; border-radius: 99px; }
+  @container (max-height: 175px) { #mini .bx { padding: 5px 1vw; gap: 3px; } #mini .bt { font-size: 1.6vh; } #mini .ch b { font-size: 2.4vh; } #mini .ch span { font-size: 1.5vh; } #mini .seg b { font-size: 2.6vh; } #mini .seg span { font-size: 1.4vh; } #mini .n { font-size: 3.4vh; } }
+  #mini .bx { border-top: 3px solid var(--ac, var(--line)); }
+  #mini .bb.gr { position: relative; padding: 0; justify-content: flex-end; }
+  #mini .bb.gr svg { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 0; }
+  #mini .bb.gr::after { content: ""; position: absolute; top: 0; right: 0; bottom: 0; width: 42%; background: linear-gradient(90deg, rgba(0,0,0,0), var(--card) 55%); z-index: 1; }
+  #mini .bb.gr .n { position: relative; z-index: 2; margin-right: .6vw; }
+  @container (max-height: 260px) { #mini .ch.x { display: none; } }
+  #mini .ch[style] { background: linear-gradient(90deg, var(--c) var(--p), rgba(255,255,255,.05) var(--p)); }
+  @container (min-height: 400px) { #mini .ch { max-height: none; justify-content: flex-end; padding-bottom: 3cqh; } #mini .ch[style] { background: linear-gradient(0deg, var(--c) var(--p), rgba(255,255,255,.05) var(--p)); } }
+  #mini .dots { position: absolute; right: 1.2vw; bottom: .8cqh; display: flex; gap: .35vw; } #mini .dots i { width: .9vw; height: .5vh; border-radius: 9px; background: rgba(255,255,255,.2); } #mini .dots i.on { background: #fff; }
   .wrap.mixed { grid-template-rows: var(--bh, 50vh) 1fr; gap: .6vh .8vw; }
   .wrap.mixed #bframe { grid-area: 1 / 1; }
   .wrap.mixed .side { grid-area: 1 / 2 / 3 / 3; }
@@ -32,8 +57,8 @@
   .scr::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: .5vw; background: var(--c); }
   .scr.ct { --c: #ef4444; } .scr.atl { --c: #38bdf8; } .scr.all { --c: #22c55e; }
   .top { display: flex; flex-direction: column; align-items: flex-start; gap: 1.2cqh; flex: none; margin-bottom: 1.6cqh; }
-  .tag { padding: .5cqh 1.96cqh; border-radius: 999px; font-size: 2.2cqh; font-weight: 800; letter-spacing: .14em; color: #fff; background: var(--c); }
-  .ttl { font-size: 4.6cqh; font-weight: 800; letter-spacing: .02em; line-height: 1.1; }
+  .tag { padding: .5cqh 1.96cqh; border-radius: 999px; font-size: max(2.7cqh, 1.2cqw); font-weight: 800; letter-spacing: .14em; color: #fff; background: var(--c); }
+  .ttl { font-size: max(5.4cqh, 3cqw); font-weight: 800; letter-spacing: .02em; line-height: 1.1; }
     .stale { color: var(--amber); font-weight: 700; }
   .smap { flex: 1; min-height: 0; display: flex; flex-direction: column; gap: 1cqh; }
   .smap svg { flex: 1; min-height: 0; width: 100%; display: block; }
@@ -44,11 +69,11 @@
   .smleg i { display: inline-block; width: 1.6cqw; height: .5cqh; border-radius: 4px; margin-right: .5cqw; vertical-align: middle; }
   .smoff { color: var(--ink); }
   .body { flex: 1; min-height: 0; display: flex; flex-direction: column; gap: 2.6cqh; justify-content: space-evenly; }
-  .foot { flex: none; margin-top: 1.2cqh; font-size: 1.9cqh; color: var(--mut); text-align: right; }
+  .foot { flex: none; margin-top: 1.2cqh; font-size: max(2.4cqh, 1.2cqw); color: var(--mut); text-align: right; }
 
   /* big number */
   .hero { display: flex; flex-direction: column; gap: .8cqh; }
-  .hero .l { font-size: 2.6cqh; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--mut); }
+  .hero .l { font-size: max(3.1cqh, 1.6cqw); font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--mut); }
   .hero .v { font-size: 19cqh; font-weight: 800; line-height: .95; font-variant-numeric: tabular-nums; letter-spacing: -.02em; }
   .hero .v.m { font-size: 15cqh; }
   .chip { align-self: flex-start; display: inline-flex; align-items: center; gap: 1.07cqh; margin-top: 1.2cqh; padding: .8cqh 2.31cqh; border-radius: 999px; font-size: 3.2cqh; font-weight: 800; }
@@ -64,17 +89,17 @@
   .tile .l { grid-column: var(--lc, auto); grid-row: var(--lr, auto); margin-top: var(--lm, 3cqh); align-self: var(--la, auto); font-size: var(--lf, min(13cqh, 6.4cqw)); }
   .tile .s { grid-column: var(--lc, auto); grid-row: var(--sr, auto); margin-top: var(--sm, 2cqh); align-self: var(--sa, auto); font-size: var(--sf, min(11cqh, 6cqw)); }
   .tile .l:last-child { grid-row: var(--lr1, auto); align-self: var(--la1, auto); }
-  @container (aspect-ratio < 1) { .tile { display: grid; grid-template-columns: auto minmax(0, 1fr); grid-template-rows: 1fr 1fr; align-items: center; column-gap: 4cqw; row-gap: 0;
-    --vc: 1; --vr: 1 / span 2; --vf: min(100cqh, 17cqw); --vlh: .8; --lc: 2; --lr: 1; --lm: 0; --la: end; --lf: min(19cqh, 4.6cqw); --sr: 2; --sm: .5cqh; --sa: start; --sf: min(15cqh, 4cqw); --lr1: 1 / span 2; --la1: center; } }
-  @container (aspect-ratio < 1) { .tiles { grid-template-columns: 1fr; } .body:has(.rows) > .tiles, .body:has(.bars) > .tiles, .body:has(.gauge) > .tiles, .body:has(.chartbox) > .tiles, .body:has(.says) > .tiles { height: calc(var(--n, 3) * 11cqh); } }
+  @container (aspect-ratio < 1) or (max-width: 780px) { .tile { display: grid; grid-template-columns: auto minmax(0, 1fr); grid-template-rows: 1fr 1fr; align-items: center; column-gap: 4cqw; row-gap: 0;
+    --vc: 1; --vr: 1 / span 2; --vf: min(100cqh, 17cqw); --vlh: .8; --lc: 2; --lr: 1; --lm: 0; --la: end; --lf: min(26cqh, 5cqw); --sr: 2; --sm: .5cqh; --sa: start; --sf: min(19cqh, 4cqw); --lr1: 1 / span 2; --la1: center; } }
+  @container (aspect-ratio < 1) or (max-width: 780px) { .tiles { grid-template-columns: 1fr; } .body:has(.rows) > .tiles, .body:has(.bars) > .tiles, .body:has(.gauge) > .tiles, .body:has(.chartbox) > .tiles, .body:has(.says) > .tiles { height: calc(var(--n, 3) * 11cqh); } }
   .tile.red .v { color: #ff7b7b; } .tile.amber .v { color: #fbbf24; } .tile.green .v { color: #5eea96; }
 
   /* bars */
   .bars { flex: 1; display: flex; flex-direction: column; justify-content: space-evenly; gap: 1cqh; }
   .bar .r1 { display: flex; align-items: baseline; justify-content: space-between; gap: 1.78cqh; margin-bottom: .8cqh; }
-  .bar .n { font-size: 3.9cqh; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .bar .x { font-size: 4.2cqh; font-weight: 800; font-variant-numeric: tabular-nums; white-space: nowrap; }
-  .bar .x small { margin-left: 1.07cqh; font-size: 2.2cqh; font-weight: 600; color: var(--mut); }
+  .bar .n { font-size: max(3.9cqh, 2cqw); font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .bar .x { font-size: max(4.2cqh, 2.1cqw); font-weight: 800; font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .bar .x small { margin-left: 1.07cqh; font-size: max(2.8cqh, 1.4cqw); font-weight: 600; color: var(--mut); }
   .bar .t { height: 3cqh; background: #12263d; border-radius: 99px; overflow: hidden; }
   .bar .t b { display: block; height: 100%; border-radius: 99px; background: linear-gradient(90deg, #1d6fc4, #38bdf8); width: 0; transition: width 1.1s cubic-bezier(.2,.7,.2,1); }
   .bar .t b { width: var(--w); position: relative; overflow: hidden; }
@@ -108,12 +133,12 @@
   /* table */
   .rows { flex: 1; display: flex; flex-direction: column; justify-content: space-evenly; gap: 1cqh; }
   .row { display: grid; grid-template-columns: 1fr auto; align-items: center; gap: 1.78cqh; background: #0f2238; border: 1px solid var(--line); border-radius: 1.78cqh; padding: 2.6cqh 2.49cqh; }
-  .row .a { font-size: 4cqh; font-weight: 800; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .row .a small { display: block; margin-top: .3cqh; font-size: 2cqh; font-weight: 500; color: var(--mut); overflow: hidden; text-overflow: ellipsis; }
-  .row .b { font-size: 4.2cqh; font-weight: 800; font-variant-numeric: tabular-nums; text-align: right; white-space: nowrap; }
+  .row .a { font-size: max(4cqh, 2cqw); font-weight: 800; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .row .a small { display: block; margin-top: .3cqh; font-size: max(2.6cqh, 1.35cqw); font-weight: 500; color: var(--mut); overflow: hidden; text-overflow: ellipsis; }
+  .row .b { font-size: max(4.2cqh, 2.1cqw); font-weight: 800; font-variant-numeric: tabular-nums; text-align: right; white-space: nowrap; }
   .row .b.red { color: #ff7b7b; } .row .b.amber { color: #fbbf24; }
   .note.now { font-size: 3.4cqh; color: #9bb7d4; } .note.now b { font-size: 4.8cqh; }
-  .note { font-size: 2.8cqh; color: var(--mut); line-height: 1.35; }
+  .note { font-size: max(2.8cqh, 1.4cqw); color: var(--mut); line-height: 1.35; }
 
   /* gauge */
   .gauge { display: flex; align-items: center; gap: 3.56cqh; }
@@ -143,19 +168,30 @@
   .scr.cr .row .a small { white-space: normal; line-height: 1.25; }
   .scr.cr { --c: #fb923c; } .scr.mv { --c: #a78bfa; } .scr.co { --c: #f59e0b; } .scr.act { --c: #2dd4bf; } .scr.tg { --c: #f472b6; }
   .tag { white-space: nowrap; }
-  .sub { flex: none; margin: -.6cqh 0 2.2cqh; font-size: 2.7cqh; font-weight: 500; line-height: 1.25; color: #b5cbe2; }
+  .sub { flex: none; margin: -.6cqh 0 2.2cqh; font-size: max(3.2cqh, 1.6cqw); font-weight: 500; line-height: 1.25; color: #b5cbe2; }
   .goals { flex: 1; display: flex; flex-direction: column; justify-content: space-evenly; gap: 1.2cqh; }
   .goal { display: grid; grid-template-columns: 1fr auto; align-items: center; gap: 2cqh; background: #0f2238; border: 1px solid var(--line); border-radius: 1.78cqh; padding: 1.6cqh 2.4cqh; }
-  .goal .a { font-size: 3.1cqh; font-weight: 800; min-width: 0; }
-  .goal .a small { display: block; margin-top: .4cqh; font-size: 2.4cqh; font-weight: 600; color: #b5cbe2; }
-  .goal .st { font-size: 2.9cqh; font-weight: 800; padding: .9cqh 2.2cqh; border-radius: 999px; white-space: nowrap; }
+  .goal .a { font-size: max(3.1cqh, 1.6cqw); font-weight: 800; min-width: 0; }
+  .goal .a small { display: block; margin-top: .4cqh; font-size: max(2.4cqh, 1.25cqw); font-weight: 600; color: #b5cbe2; }
+  .goal .st { font-size: max(2.9cqh, 1.5cqw); font-weight: 800; padding: .9cqh 2.2cqh; border-radius: 999px; white-space: nowrap; }
   .goal .st.g { background: rgba(34,197,94,.2); color: #6ee7a0; } .goal .st.y { background: rgba(245,158,11,.22); color: #fbbf24; } .goal .st.r { background: rgba(239,68,68,.22); color: #ff8a8a; }
+
+  /* wide panels with one big number and some tiles: number on the left, tiles stacked on the right, so nothing is a big empty box */
+  @container (aspect-ratio > 1.45) and (min-width: 781px) {
+    .body:has(> .hero):has(> .tiles) { display: grid; grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr); grid-auto-rows: minmax(0, 1fr); column-gap: 3cqw; row-gap: 1.6cqh; align-content: stretch; justify-content: normal; }
+    .body:has(> .hero):has(> .tiles) > .hero { grid-column: 1; grid-row: 1 / -1; align-self: center; }
+    .body:has(> .hero):has(> .tiles) > .hero .v, .body:has(> .hero):has(> .tiles) > .hero .v.m { font-size: min(28cqh, 11.5cqw); }
+    .body:has(> .hero):has(> .tiles) > .tiles { grid-column: 2; grid-template-columns: 1fr; height: auto; min-height: 0; }
+    .body:has(> .hero):has(> .tiles) .tile { display: grid; grid-template-columns: auto minmax(0, 1fr); grid-template-rows: 1fr 1fr; align-items: center; column-gap: 3cqw; row-gap: 0;
+      --vc: 1; --vr: 1 / span 2; --vf: min(100cqh, 15cqw); --vlh: .8; --lc: 2; --lr: 1; --lm: 0; --la: end; --lf: min(24cqh, 3.1cqw); --sr: 2; --sm: .5cqh; --sa: start; --sf: min(19cqh, 3cqw); --lr1: 1 / span 2; --la1: center; }
+  }
 </style>
 </head>
 <body>
 <div class="wrap">
   <div id="bframe"><iframe id="bf" title="Live Board" scrolling="no"></iframe></div>
   <div id="stage2"></div>
+  <div id="mini"></div>
   <div class="side"><div class="stage" id="stage"><div class="empty">Loading the numbers…</div></div></div>
 </div>
 
@@ -539,9 +575,49 @@ function mount() {
   timer = setInterval(() => show(nextI), ROTATE_SEC * 1000);
 }
 
+
+// ── slim strip under the board (when there are too many shipments for the full panels): wide, short items only, one at a time ──
+let miniI = 0, miniT = null;
+function sparkline(vals, color) {
+  if (vals.length < 2) return '';
+  const lo = Math.min(...vals), hi = Math.max(...vals), sp = (hi - lo) || 1;
+  const pts = vals.map((v, i) => (i / (vals.length - 1) * 1000).toFixed(1) + ',' + (92 - (v - lo) / sp * 84).toFixed(1)).join(' ');
+  return `<svg viewBox="0 0 1000 100" preserveAspectRatio="none"><polygon points="0,100 ${pts} 1000,100" fill="${color}" opacity=".16"/><polyline points="${pts}" fill="none" stroke="${color}" stroke-width="4" vector-effect="non-scaling-stroke" stroke-linejoin="round"/></svg>`;
+}
+function miniPages() {
+  const ct = (D && D.ct) || {}, tr = ((D && D.trend) || []).slice().sort((a, b) => a.d < b.d ? -1 : 1), mv = ((D && D.x) || {}).moves || {};
+  const chip = (b, sp, pct, col, x) => `<div class="ch${x ? ' x' : ''}"${pct != null && col ? ` style="--p:${pct}%;--c:${col}59"` : ''}><b>${esc(b)}</b><span>${esc(sp)}</span></div>`;
+  const bx = (t, sub, body, w, ac, cls) => `<div class="bx" style="--w:${w || 1};--ac:${ac || 'var(--line)'}"><div class="bt">${esc(t)}${sub ? `<small>${esc(sub)}</small>` : ''}</div><div class="bb${cls ? ' ' + cls : ''}">${body}</div></div>`;
+  const sp = (k, c) => tr.length > 3 ? sparkline(tr.map(t => t[k]), c) : '';
+  const rate = (ct.sinceBaseline && ct.sinceBaseline.rate) || Math.round((ct.recoveryRate || 0) * 100);
+  const B = {};
+  B.out = bx('Tools out', tr.length > 3 ? 'since ' + tr[0].d.slice(5) : '', sp('out', '#60a5fa') + `<div class="n">${ct.out}</div>`, 1, '#60a5fa', 'gr');
+  B.worth = bx('Worth', tr.length > 3 ? 'since ' + tr[0].d.slice(5) : '', sp('value', '#f87171') + `<div class="n">${money(ct.value)}</div>`, 1, '#f87171', 'gr');
+  B.gone = bx('Gone 30+ days', tr.length > 3 ? 'since ' + tr[0].d.slice(5) : '', sp('crit', '#fbbf24') + `<div class="n">${ct.crit}</div>`, 1, '#fbbf24', 'gr');
+  if ((ct.bands || []).length) { const cols = ['#4ade80', '#a3e635', '#fbbf24', '#fb923c', '#f87171'], tot = ct.bands.reduce((a, b) => a + b.count, 0) || 1;
+    B.bands = bx('How long they have been out', 'number of tools', ct.bands.map((b, i) => `<div class="seg" style="flex:${Math.max(b.count, tot * .1)};background:${cols[i] || '#9db2cc'}"><b>${b.count}</b><span>${esc(((b.name.match(/\(([^)]*)\)/) || [, ''])[1]) + ' days')}</span></div>`).join(''), 2); }
+  if (ct.recovered) B.back = bx('Tools we got back', 'since tracking began', `<div class="n">${Number(ct.recovered).toLocaleString('en-US')}</div><div class="bar"><i style="width:${rate}%"></i></div><div class="n" style="font-size:min(26cqh,5vh)">${rate}%</div>`, 1, '#4ade80');
+  if ((ct.stations || []).length) { const st = ct.stations.slice(0, 3), mx = Math.max(...st.map(x => x.value)) || 1;
+    B.money = bx('Holding the most money', '', st.map((s, i) => chip(money(s.value), s.name + ' · ' + s.tools + (s.tools === 1 ? ' tool' : ' tools'), Math.max(8, s.value / mx * 100), '#60a5fa', i > 2)).join(''), 1, '#60a5fa'); }
+  if ((ct.chase || []).length) { const ch = ct.chase.slice(0, 3), mx = Math.max(...ch.map(x => x.tools)) || 1, ac = d => d >= 90 ? '#f87171' : d >= 30 ? '#fb923c' : '#4ade80';
+    B.chase = bx('Stations to chase', 'color = oldest', ch.map((s, i) => chip(s.name + ' · ' + s.tools, 'oldest ' + s.oldest + ' d', Math.max(10, s.tools / mx * 100), ac(s.oldest), i > 2)).join(''), 1, '#fb923c'); }
+  if (mv.thisMonth != null) { const bm = (mv.byMonth || []).slice(-4), mx = Math.max(mv.thisMonth, ...bm.map(x => x.total), 1);
+    B.ship = bx('Shipments handled', 'by month', bm.filter(x => !/NOV 2026/.test(x.m)).slice(-3).map(x => chip(String(x.total), x.m.slice(0, 3), Math.max(8, x.total / mx * 100), '#a78bfa')).join('') + chip(String(mv.thisMonth), 'this month', Math.max(8, mv.thisMonth / mx * 100), '#a78bfa'), 1, '#a78bfa'); }
+  if ((ct.oldest || []).length) B.old = bx('Out the longest', '', ct.oldest.slice(0, 3).map(t => chip(t.id, String(t.days).toLowerCase(), 100, '#f87171')).join(''), 1, '#f87171');
+  if ((ct.priciest || []).length) B.price = bx('Most valuable still out', '', ct.priciest.slice(0, 3).map(t => chip(t.id, String(t.days).toLowerCase(), 100, '#fbbf24')).join(''), 1, '#fbbf24');
+  return [['out', 'worth', 'gone'], ['bands', 'back'], ['money', 'chase', 'ship'], ['old', 'price']].map(pg => pg.map(k => B[k]).filter(Boolean)).filter(pg => pg.length);
+}
+function drawMini() {
+  const P = miniPages(); if (!P.length) return; miniI %= P.length;
+  $('#mini').innerHTML = P[miniI].join('') + `<div class="dots">${P.map((_, i) => `<i class="${i === miniI ? 'on' : ''}"></i>`).join('')}</div>`;
+}
+function startMini() {
+  if (!miniT) { drawMini(); miniT = setInterval(() => { miniI++; drawMini(); }, 9000); }
+}
+
 // ── live board (left): the board's own TV view, scaled to the box ────────────
-let mode = 'side';
-const BASE_SIDE = 1320, BASE_STACK = 1500, H_VIRT = 1000;
+let mode = 'side', solo = true, crowded = false, lastPing = 0, lastBase = 0, lastN = -1, lastVirt = 1000;
+const BASE_SIDE = 1320, BASE_STACK = 1778, H_VIRT = 1000;
 function fitBoard() {
   const wrap = $('.wrap'), box = $('#bframe'), f = $('#bf'), W = wrap.clientWidth, Hh = wrap.clientHeight;
   if (mode === 'side') {
@@ -550,25 +626,46 @@ function fitBoard() {
     f.style.width = BASE_SIDE + 'px'; f.style.height = Math.ceil(h / k) + 'px'; f.style.transform = 'scale(' + k + ')';
     return 0;
   }
-  const base = mode === 'stack' ? BASE_STACK : BASE_SIDE, k = (mode === 'stack' ? W : box.clientWidth || W * 0.61) / base;
-  const ok = board && Math.abs(board.W - base) < 3 && Math.abs(board.H - H_VIRT) < 3;
-  const bandH = Math.min(Hh * 0.72, (ok ? board.need * k : Hh * 0.35) + Hh * 0.015);
+  const nn = board ? board.n : 5, pad = Hh * 0.03;
+  const frac = nn === 0 ? 0.24 : nn === 1 ? 0.34 : nn === 2 ? 0.42 : nn <= 4 ? 0.58 : nn <= 7 ? 0.66 : 0.74;
+  const hasM = board && board.need > 0, needV = hasM ? board.need : 0;
+  // how big the shipment text can be: the board is drawn on a virtual canvas BASE px wide, so a smaller BASE means bigger text
+  const BMIN = 1250, BMAX = BASE_STACK;
+  if (hasM) {
+    crowded = needV * (W / BMAX) + pad > Hh * 0.70;
+    const T = frac * Hh;
+    const want = Math.max(BMIN, Math.min(BMAX, W / Math.max(0.5, (T - pad) / needV)));
+    // only re-fit when the shipment count changes or the board no longer fits; otherwise leave it alone so the screen never flickers between two sizes
+    const curBand = needV * (W / (lastBase || BMAX)) + pad;
+    if (!lastBase || nn !== lastN || curBand > Hh * 0.86 || (curBand < T * 0.8 && lastBase > BMIN + 5 && board.W === lastBase)) { lastN = nn; lastBase = Math.round(want); lastPing = 0; }
+  }
+  const base = lastBase || 1600, k = W / base;
+  const ok = board && Math.abs(board.W - base) < 3;
+  if (!ok && board && lastPing !== base) { lastPing = base; setTimeout(() => { try { f.contentWindow.postMessage({ ctbPing: 1 }, '*'); } catch (e) {} }, 400); }
+  const cap = Hh * 0.86;
+  const bandH = Math.min(cap, (ok ? needV * k : Hh * frac) + pad);
+  // too many shipments for one screen: shorten the board's canvas so it splits them into pages that fit
+  const virtH = (ok && needV * k + pad > cap) ? Math.floor((cap - pad) / k) : H_VIRT;
+  if (ok && Math.abs(virtH - lastVirt) > 3) { lastVirt = virtH; setTimeout(() => { try { f.contentWindow.postMessage({ ctbPing: 1 }, '*'); } catch (e) {} }, 400); }
   wrap.style.setProperty('--bh', bandH + 'px');
-  f.style.width = base + 'px'; f.style.height = H_VIRT + 'px'; f.style.transform = 'scale(' + k + ')';
+  f.style.width = base + 'px'; f.style.height = virtH + 'px'; f.style.transform = 'scale(' + k + ')';
   return bandH;
 }
 // the board tells us how many shipments it is showing; the fewer there are, the more room the metrics get
 function applyLayout() {
   const n = board ? board.n : 99;
-  let want = n <= 2 ? 'stack' : n <= 4 ? 'mixed' : 'side';
+  let want = 'stack';
   // five or six rows still fit in the top band, so keep the metrics panel under them instead of leaving that space empty
-  if (want === 'side' && board && Math.abs(board.W - BASE_SIDE) < 3) {
+  if (false && board && Math.abs(board.W - BASE_SIDE) < 3) {
     const Hh0 = $('.wrap').clientHeight, k0 = ($('.wrap').clientWidth * 0.61) / BASE_SIDE;
     if (board.need * k0 + Hh0 * 0.015 <= Hh0 * 0.72) want = 'mixed';
   }
   const was = mode; mode = want;
-  const wrap = $('.wrap'); wrap.classList.toggle('stack', mode === 'stack'); wrap.classList.toggle('mixed', mode === 'mixed');
+  const wrap = $('.wrap'); wrap.classList.toggle('stack', mode === 'stack'); wrap.classList.toggle('mixed', mode === 'mixed'); wrap.classList.toggle('solo', solo);
   const bandH = fitBoard(), Hh = wrap.clientHeight;
+  wrap.classList.toggle('solo', solo);
+  if (solo) startMini();
+  try { $('#bf').contentWindow.postMessage({ ctbFill: false }, '*'); } catch (e) {}
   const c = mode === 'stack' ? ((Hh - bandH) / Hh >= 0.5 ? 3 : 2) : mode === 'mixed' ? 2 : 1;
   if (c !== cols || was !== mode) { cols = c; $('#stage').style.setProperty('--cols', mode === 'mixed' ? 1 : cols); if (screens.length) { show(cur); if (timer) { clearInterval(timer); timer = setInterval(() => show(nextI), ROTATE_SEC * 1000); } } }
 }
