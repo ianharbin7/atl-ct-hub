@@ -633,7 +633,7 @@ function fitBoard() {
   // how big the shipment text can be: the board is drawn on a virtual canvas BASE px wide, so a smaller BASE means bigger text
   const BMIN = 1250, BMAX = BASE_STACK;
   if (hasM) {
-    crowded = needV * (W / BMAX) + pad > Hh * 0.70;
+    crowded = needV * (W / BMAX) + pad > Hh * (crowded ? 0.62 : 0.70);   // a little slack so it never flips back and forth
     const T = frac * Hh;
     const want = Math.max(BMIN, Math.min(BMAX, W / Math.max(0.5, (T - pad) / needV)));
     // only re-fit when the shipment count changes or the board no longer fits; otherwise leave it alone so the screen never flickers between two sizes
@@ -664,6 +664,7 @@ function applyLayout() {
   const was = mode; mode = want;
   const wrap = $('.wrap'); wrap.classList.toggle('stack', mode === 'stack'); wrap.classList.toggle('mixed', mode === 'mixed'); wrap.classList.toggle('solo', solo);
   const bandH = fitBoard(), Hh = wrap.clientHeight;
+  solo = crowded;      // full graph screens while the board has room; the small tile strip only when the board is crowded
   wrap.classList.toggle('solo', solo);
   if (solo) startMini();
   try { $('#bf').contentWindow.postMessage({ ctbFill: false }, '*'); } catch (e) {}
