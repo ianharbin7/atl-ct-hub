@@ -354,7 +354,7 @@ function buildScreens() {
   const MON = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
   const monName = m => { const p = String(m || '').split('-'); return p.length > 1 ? MON[(+p[1] || 1) - 1] + ' ' + p[0] : String(m || ''); };
   const room = s => title(String(s || '').replace(/INTERNATIONA$/i, 'INTERNATIONAL').replace(/\s*TOOL(\s*R(O|OO|OOM)?)?$/i, '').replace(/^593\s+/, '').replace(/\s593\s/, ' ').replace(/\s*-\s*$/, '')).replace(/^(\w{3})\s/, (m, a) => a.toUpperCase() + ' ').replace(/\bToc5\b/, 'TOC5');
-  const SHIFT = { '1ST': '1st Shift (6a–2p)', '2ND': '2nd Shift (2p–11p)', '3RD': '3rd Shift (11p–6a)', '1ST WEEKEND': 'Weekend 1st (6:30a–6:30p)', '3RD WEEKEND': 'Weekend 3rd (6:30p–6:30a)' };
+  const SHIFT = { '1ST': '1st Shift (6a–2p)', '2ND': '2nd Shift (2p–10p)', '3RD': '3rd Shift (10p–6a)', '1ST WEEKEND': 'Weekend 1st (6a–6p)', '3RD WEEKEND': 'Weekend 3rd (6p–6a)' };
   const shiftName = s => SHIFT[String(s || '').toUpperCase()] || title(s);
 
   // ───────────────────────── CENTRAL TOOLING ─────────────────────────
