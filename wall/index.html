@@ -608,6 +608,7 @@ function miniPages() {
   return [['out', 'worth', 'gone'], ['bands', 'back'], ['money', 'chase', 'ship'], ['old', 'price']].map(pg => pg.map(k => B[k]).filter(Boolean)).filter(pg => pg.length);
 }
 function drawMini() {
+  if (!D) return;   // wait until the numbers have loaded so the boxes never show "undefined"
   const P = miniPages(); if (!P.length) return; miniI %= P.length;
   $('#mini').innerHTML = P[miniI].join('') + `<div class="dots">${P.map((_, i) => `<i class="${i === miniI ? 'on' : ''}"></i>`).join('')}</div>`;
 }
@@ -694,7 +695,7 @@ let sig = '';
 async function refresh() {
   const d = await loadData(); if (!d) return;
   const s = JSON.stringify(d); if (s === sig) return;
-  sig = s; D = d; screens = buildScreens(); mount();
+  sig = s; D = d; screens = buildScreens(); mount(); if (miniT) drawMini();
 }
 (async function () {
   applyLayout(); await refresh();
