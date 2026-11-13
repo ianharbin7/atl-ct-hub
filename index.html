@@ -51,7 +51,7 @@ header .clock small { font-size: 11px; color: #8fb2d4; margin-left: 3px; font-we
 main { padding: 12px 12px calc(30px + env(safe-area-inset-bottom)); display: flex; flex-direction: column; gap: 12px; }
 .card { --c: #64748b; position: relative; background: linear-gradient(165deg, var(--card2), var(--card)); border: 1px solid var(--line); border-radius: 18px; padding: 14px 14px 12px 18px; overflow: hidden; box-shadow: 0 6px 18px rgba(0,0,0,.35); animation: cin .45s ease-out both; }
 .card::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 7px; background: var(--c); }
-.card.g { --c: var(--green); } .card.a { --c: var(--amber); } .card.r { --c: var(--red); border-color: #7f1d1d; background: linear-gradient(165deg, #2a1119, #170c12); } .card.tr { --c: var(--sky); }
+.card.g { --c: var(--green); } .card.a { --c: var(--amber); } .card.r { --c: var(--red); border-color: #7f1d1d; background: linear-gradient(165deg, #2a1119, #170c12); } .card.tr { --c: var(--sky); } .card.up { --c: var(--sky); border-style: dashed; }
 .card.r::before { background: repeating-linear-gradient(45deg, #ef4444 0 7px, #7f1d1d 7px 14px); }
 @keyframes cin { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
 .rtrow { display: flex; align-items: center; gap: 10px; }
@@ -173,8 +173,9 @@ const cmHtml = c => {
   return (m[1] ? `<div class="note tl">${esc(m[1])}</div>` : '') + `<div class="note nt"><b>Note</b>${esc(m[2])}</div>`;
 };
 const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
-let jobs = [], wsOk = false, tab = null, editId = null;
+let jobs = [], held = [], wsOk = false, tab = null, editId = null;
 try { const c = JSON.parse(localStorage.getItem('ctapp-jobs') || 'null'); if (Array.isArray(c)) jobs = c; } catch (e) {}
+try { const c = JSON.parse(localStorage.getItem('ctapp-held') || 'null'); if (Array.isArray(c)) held = c; } catch (e) {}
 const etFmt = new Intl.DateTimeFormat('en-US', { timeZone: 'America/New_York', year: 'numeric', month: 'numeric', day: 'numeric', hour: 'numeric', minute: 'numeric', hourCycle: 'h23' });
 function etParts(d) { const p = {}; etFmt.formatToParts(d).forEach(x => { p[x.type] = x.value; }); return { y: +p.year, mo: +p.month, d: +p.day, h: (+p.hour) % 24, mi: +p.minute }; }
 function etWall(y, mo, d, h, mi) { const want = Date.UTC(y, mo - 1, d, h, mi); let g = want; for (let i = 0; i < 3; i++) { const p = etParts(new Date(g)); g += want - Date.UTC(p.y, p.mo - 1, p.d, p.h, p.mi); } return g; }
@@ -203,6 +204,19 @@ return 'https://www.delta.com/flightstatus/1/' + parseInt(m[1], 10) + '/' + p.y 
 const PLANE = '<svg viewBox="0 0 120 100" aria-hidden="true"><use href="#jet"/></svg>';
 const pending = new Set(); let touching = false, dirty = false, tipN = 0, lastHtml = { sum: '', tabs: '', list: '' };
 const TIPS = ['All clear. New shipments show up here live.', 'Tools are home. CT is standing by.', 'Grab a coffee. We are all clear.', 'When something lands, you will see it right here.'];
+const HDOW = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+function hWhen(iso, noTime) { if (!iso) return ''; const p = etParts(new Date(iso)); const d = HDOW[new Date(Date.UTC(p.y, p.mo - 1, p.d)).getUTCDay()] + ' ' + p.mo + '/' + p.d; return noTime ? d : d + ' ' + String(p.h).padStart(2, '0') + ':' + String(p.mi).padStart(2, '0'); }
+function heldCard(h) {
+  const parts = String(h.route || '').split(/[-–]/);
+  const rt = parts.length > 1 ? `<b>${esc(parts[0])}</b>${PLANE}<b>${esc(parts[1])}</b>` : `<b>${esc(h.route || '')}</b>`;
+  const hasT = /^\d{4}$/.test(h.time || ''), out = isOut(h), busy = pending.has('h' + h.id) ? ' disabled' : '';
+  const left = Math.max(0, Date.parse(h.showAtISO) - Date.now()) / 60000;
+  return `<div class="card up"><div class="rtrow"><div class="rt">${rt}</div><div class="cdw"><span class="cd lg">UPCOMING</span><small>on the board in ${left >= 1440 ? Math.floor(left / 1440) + 'd ' + Math.floor((left % 1440) / 60) + 'h' : dur(left)}</small></div></div>
+<div class="chips">${h.type ? `<span class="tag type">${esc(h.type)}</span>` : ''}</div>
+<div class="hero"><div><b>Flight</b><span>${h.flt ? esc(h.flt) : '&mdash;'}</span></div><div><b>${out ? 'ETD' : 'ETA'}</b><span>${hasT ? esc(fmtT(h.time)) : '&mdash;'}</span></div><div><b>Date</b><span>${esc(hWhen(h.dueISO, true).split(' ')[1] || '')}</span></div></div>
+<div class="minor"><span><b>Due</b>${esc(hWhen(h.dueISO, !hasT))}</span><span><b>Appears</b>${esc(hWhen(h.showAtISO))}</span>${h.awb ? `<span><b>AWB</b>${esc(h.awb)}</span>` : ''}</div>${cmHtml(h.comments)}
+<div class="btns"><button type="button" class="go" data-a="hrel" data-id="${h.id}"${busy}>Put on board now</button><button type="button" data-a="hdel" data-id="${h.id}"${busy}>Remove</button></div></div>`;
+}
 function card(r) {
   const j = r.j, out = isOut(j), m = r.t == null ? null : (r.t - Date.now()) / 60000, busy = pending.has(j.id) ? ' disabled' : '';
   const c = j.transit ? 'tr' : m == null ? '' : m < 45 ? 'r' : m < 90 ? 'a' : 'g';
@@ -235,10 +249,12 @@ function render(force) {
   const out = rows.filter(r => isOut(r.j)), inn = rows.filter(r => !isOut(r.j));
   if (tab == null || (tab === 'out' && !out.length && inn.length) || (tab === 'in' && !inn.length && out.length)) tab = out.length || !inn.length ? 'out' : 'in';
   const s = `<div><b>${rows.length}</b>Open</div><div class="lt${late ? ' bad' : ''}"><b>${late}</b>Late</div><div class="sn${soon ? ' warn' : ''}"><b>${soon}</b>Under 45 min</div>`;
-  const t = `<button type="button" class="${tab === 'out' ? 'on' : ''}" data-tab="out">Take to the plane<i>${out.length}</i></button><button type="button" class="${tab === 'in' ? 'on' : ''}" data-tab="in">Go pick up<i>${inn.length}</i></button>`;
+  if (tab === 'up' && !held.length) tab = out.length || !inn.length ? 'out' : 'in';
+  const hsorted = held.slice().sort((a, b) => Date.parse(a.showAtISO) - Date.parse(b.showAtISO));
+  const t = `<button type="button" class="${tab === 'out' ? 'on' : ''}" data-tab="out">Take to the plane<i>${out.length}</i></button><button type="button" class="${tab === 'in' ? 'on' : ''}" data-tab="in">Go pick up<i>${inn.length}</i></button>` + (held.length ? `<button type="button" class="${tab === 'up' ? 'on' : ''}" data-tab="up">Upcoming<i>${held.length}</i></button>` : '');
   const list = tab === 'out' ? out : inn;
   const empty = `<div class="none"><div class="scope"><canvas id="scope"></canvas></div><div class="sub">ATL area &middot; standby</div><h3>Nothing on the board right now</h3><p id="tip">${TIPS[tipN % TIPS.length]}</p></div>`;
-  const l = (list.length ? list.map(card).join('') : empty) + `<div class="foot"><a href="${BOARD}" target="_blank" rel="noopener">Open the full Live Board &#8599;</a></div>`;
+  const l = (tab === 'up' ? hsorted.map(heldCard).join('') : list.length ? list.map(card).join('') : empty) + `<div class="foot"><a href="${BOARD}" target="_blank" rel="noopener">Open the full Live Board &#8599;</a></div>`;
   if (s !== lastHtml.sum) { $('#sum').innerHTML = s; lastHtml.sum = s; }
   if (t !== lastHtml.tabs) { $('#tabs').innerHTML = t; lastHtml.tabs = t; }
   if (l !== lastHtml.list) { $('#list').innerHTML = l; lastHtml.list = l; scopeMount(); }
@@ -393,9 +409,20 @@ document.addEventListener('click', e => {
   else if (a === 'done') act(id, 'done', t.dataset.l);
   else if (a === 'stand') act(id, 'stand', 'Stood down');
   else if (a === 'edit') openEdit(id);
+  else if (a === 'hrel') heldAct(id, 'release');
+  else if (a === 'hdel') heldAct(id, 'remove');
 });
 ['touchstart', 'pointerdown'].forEach(n => document.addEventListener(n, () => { touching = true; }, { passive: true }));
 ['touchend', 'touchcancel', 'pointerup', 'pointercancel'].forEach(n => document.addEventListener(n, () => { setTimeout(() => { touching = false; if (dirty) render(); }, 700); }, { passive: true }));
+async function heldAct(id, a) {
+  const h = held.find(x => x.id === id); if (!h || pending.has('h' + id)) return;
+  if (a === 'remove' && !confirm('Remove this upcoming shipment? It will not appear on the board.')) return;
+  pending.add('h' + id); render(true);
+  const r = await api(a === 'release' ? 'POST' : 'DELETE', '/api/held/' + id + (a === 'release' ? '/release' : ''));
+  pending.delete('h' + id);
+  if (r) { held = held.filter(x => x.id !== id); try { localStorage.setItem('ctapp-held', JSON.stringify(held)); } catch (x) {} toast(a === 'release' ? 'Put on the board' : 'Removed'); }
+  render(true);
+}
 function openEdit(id) {
   const j = jobs.find(x => x.id === id); if (!j) return; editId = id;
   $('#sheetTitle').textContent = 'Edit ' + String(j.route || '').replace('-', ' → ');
@@ -417,7 +444,7 @@ function connectWS() {
   let ws;
   try { ws = new WebSocket(BOARD.replace(/^http/, 'ws') + '/live'); } catch (e) { setTimeout(connectWS, 5000); return; }
   ws.onopen = () => { wsOk = true; render(); };
-  ws.onmessage = ev => { try { const m = JSON.parse(ev.data); if (m.type === 'init' || m.type === 'jobs') { jobs = m.jobs || []; try { localStorage.setItem('ctapp-jobs', JSON.stringify(jobs)); } catch (x) {} render(); } } catch (x) {} };
+  ws.onmessage = ev => { try { const m = JSON.parse(ev.data); if (m.type === 'init' || m.type === 'jobs') { jobs = m.jobs || []; try { localStorage.setItem('ctapp-jobs', JSON.stringify(jobs)); } catch (x) {} if (m.type === 'init') { held = m.held || []; try { localStorage.setItem('ctapp-held', JSON.stringify(held)); } catch (x) {} } render(); } else if (m.type === 'held') { held = m.held || []; try { localStorage.setItem('ctapp-held', JSON.stringify(held)); } catch (x) {} render(); } } catch (x) {} };
   ws.onclose = () => { wsOk = false; render(); setTimeout(connectWS, 4000); };
   ws.onerror = () => ws.close();
 }
