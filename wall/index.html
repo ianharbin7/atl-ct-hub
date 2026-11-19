@@ -170,6 +170,7 @@
   /* auto-fit: --fk (set by fitText) shrinks a tile's label/sub-text just enough that nothing is cut off */
   .tile .l { font-size: calc(var(--lf, min(13cqh, 6.4cqw)) * var(--fk, 1)); }
   .tile .s { font-size: calc(var(--sf, min(11cqh, 6cqw)) * var(--fk, 1)); }
+  .tile .v { font-size: calc(var(--vf, min(52cqh, 19cqw)) * var(--vk, 1)); }
   .say span { font-size: calc(min(5.2cqh, 5.6cqw) * var(--fk, 1)); }
   .say b { font-size: calc(min(3cqh, 3.2cqw) * var(--fk, 1)); }
   .empty { margin: auto; font-size: 3cqh; color: var(--mut); text-align: center; }
@@ -260,8 +261,9 @@ function fitText() {
     if (el.clientHeight < 20) return;
     const over = () => el.scrollHeight > el.clientHeight + 1 || el.scrollWidth > el.clientWidth + 1;
     if (el.dataset.fkw === el.clientWidth + 'x' + el.clientHeight + ':' + el.textContent.length) return;
-    el.style.removeProperty('--fk');
+    el.style.removeProperty('--fk'); el.style.removeProperty('--vk');
     let k = 1; while (over() && k > .45) { k -= .05; el.style.setProperty('--fk', k.toFixed(2)); }
+    let vk = 1; while (over() && vk > .6) { vk -= .05; el.style.setProperty('--vk', vk.toFixed(2)); }
     el.dataset.fkw = el.clientWidth + 'x' + el.clientHeight + ':' + el.textContent.length;
   });
 }
