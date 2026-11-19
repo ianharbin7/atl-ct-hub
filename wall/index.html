@@ -634,7 +634,7 @@ function fitBoard() {
   const frac = nn === 0 ? 0.24 : nn === 1 ? 0.34 : nn === 2 ? 0.42 : nn <= 4 ? 0.58 : nn <= 7 ? 0.66 : 0.74;
   const hasM = board && board.need > 0, needV = hasM ? board.need : 0;
   // how big the shipment text can be: the board is drawn on a virtual canvas BASE px wide, so a smaller BASE means bigger text
-  const BMIN = 1250, BMAX = BASE_STACK;
+  const BMIN = 1420, BMAX = BASE_STACK;
   if (hasM) {
     crowded = needV * (W / BMAX) + pad > Hh * (crowded ? 0.54 : 0.62);   // a little slack so it never flips back and forth
     const T = frac * Hh;
