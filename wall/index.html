@@ -68,6 +68,9 @@
   .smleg { display: flex; flex-wrap: wrap; gap: .4cqh 2cqw; color: var(--mut); font-size: clamp(13px, 4cqw, 24px); }
   .smleg i { display: inline-block; width: 1.6cqw; height: .5cqh; border-radius: 4px; margin-right: .5cqw; vertical-align: middle; }
   .smoff { color: var(--ink); }
+  /* wide, short box (board plus panel): map on the left, legend as a column on the right, so the map is as big as the box allows */
+  @container (aspect-ratio > 2.2) { .smap { flex-direction: row; align-items: stretch; gap: 2.4cqw; } .smap svg { flex: 1 1 0; min-width: 0; } .smleg { flex: 0 0 29cqw; flex-direction: column; flex-wrap: nowrap; justify-content: center; align-content: center; gap: 1.6cqh; font-size: clamp(14px, 2.3cqw, 28px); }
+    .scr:has(.smap) .sub { display: none; } .scr:has(.smap) .top { flex-direction: row; align-items: center; gap: 2cqw; margin-bottom: 1cqh; } .scr:has(.smap) .ttl { font-size: max(4.6cqh, 2.4cqw); } }
   .body { flex: 1; min-height: 0; display: flex; flex-direction: column; gap: 2.6cqh; justify-content: space-evenly; }
   .foot { flex: none; margin-top: 1.2cqh; font-size: max(2.4cqh, 1.2cqw); color: var(--mut); text-align: right; }
 
@@ -633,7 +636,7 @@ function fitBoard() {
   // how big the shipment text can be: the board is drawn on a virtual canvas BASE px wide, so a smaller BASE means bigger text
   const BMIN = 1250, BMAX = BASE_STACK;
   if (hasM) {
-    crowded = needV * (W / BMAX) + pad > Hh * (crowded ? 0.62 : 0.70);   // a little slack so it never flips back and forth
+    crowded = needV * (W / BMAX) + pad > Hh * (crowded ? 0.54 : 0.62);   // a little slack so it never flips back and forth
     const T = frac * Hh;
     const want = Math.max(BMIN, Math.min(BMAX, W / Math.max(0.5, (T - pad) / needV)));
     // only re-fit when the shipment count changes or the board no longer fits; otherwise leave it alone so the screen never flickers between two sizes
